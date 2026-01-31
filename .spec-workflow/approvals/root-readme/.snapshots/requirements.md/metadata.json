@@ -1,0 +1,22 @@
+{
+  "filePath": ".spec-workflow/specs/root-readme/requirements.md",
+  "currentVersion": 2,
+  "snapshots": [
+    {
+      "version": 1,
+      "filename": "snapshot-001.json",
+      "timestamp": "2026-01-31T15:21:50.974Z",
+      "trigger": "initial",
+      "approvalId": "approval_1769872910972_p3yl33qt8",
+      "approvalTitle": "Root README Requirements"
+    },
+    {
+      "version": 2,
+      "filename": "snapshot-002.json",
+      "timestamp": "2026-01-31T15:22:29.041Z",
+      "trigger": "approved",
+      "approvalId": "approval_1769872910972_p3yl33qt8",
+      "approvalTitle": "Root README Requirements"
+    }
+  ]
+}

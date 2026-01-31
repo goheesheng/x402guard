@@ -1,0 +1,30 @@
+{
+  "filePath": ".spec-workflow/specs/developer-documentation/requirements.md",
+  "currentVersion": 3,
+  "snapshots": [
+    {
+      "version": 1,
+      "filename": "snapshot-001.json",
+      "timestamp": "2026-01-31T14:37:15.604Z",
+      "trigger": "initial",
+      "approvalId": "approval_1769870235602_ymorkbyxn",
+      "approvalTitle": "Requirements: Developer-Friendly Documentation"
+    },
+    {
+      "version": 2,
+      "filename": "snapshot-002.json",
+      "timestamp": "2026-01-31T14:39:18.997Z",
+      "trigger": "revision_requested",
+      "approvalId": "approval_1769870235602_ymorkbyxn",
+      "approvalTitle": "Requirements: Developer-Friendly Documentation"
+    },
+    {
+      "version": 3,
+      "filename": "snapshot-003.json",
+      "timestamp": "2026-01-31T14:40:14.970Z",
+      "trigger": "approved",
+      "approvalId": "approval_1769870394989_fg3bfewik",
+      "approvalTitle": "Requirements: x402guard Developer Documentation"
+    }
+  ]
+}

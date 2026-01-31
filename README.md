@@ -1,176 +1,150 @@
-# SkillGuard
+# x402guard
 
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Node](https://img.shields.io/badge/Node-20+-green.svg)](https://nodejs.org)
+> **Pre-install security auditing for AI agent skills** — powered by x402
 
-Open-Source SDK & Server for Secure Agent Skill Auditing on x402
+[![x402](https://img.shields.io/badge/x402-enabled-blue.svg)](https://x402.org)
+[![Base](https://img.shields.io/badge/Base-mainnet-blue.svg)](https://base.org)
 
-🚀 **Production API Available**: [https://skillguard-api.vercel.app](https://skillguard-api.vercel.app)
+## What is x402guard?
 
-## 🌟 The SkillGuard Stack
+AI agents use "skills" (markdown files with embedded code) to gain new capabilities. A malicious skill can steal your credentials **before any payment happens** — bypassing x402-secure and Trustline entirely. x402guard scans skills before installation to catch credential theft, data exfiltration, and malware.
 
-SkillGuard fills the missing **Layer 2 (Code Security)** of the agentic trust stack:
+## The Problem
 
-| Layer | Component | Status |
-|-------|-----------|--------|
-| Layer 4 | Payment Security | x402-secure ✓ |
-| Layer 3 | Runtime Behavior | Trustline ✓ |
-| **Layer 2** | **Code Security** | **SkillGuard ★** |
-| Layer 1 | Identity | ERC-8004 ◐ |
+```
+WITHOUT x402guard:
+┌─────────────────────────────────────────────────────────────┐
+│ 1. User installs weather-skill.md     ← No security check   │
+│ 2. Skill reads ~/.aws/credentials     ← tAudit: NOT triggered│
+│ 3. Skill POSTs to attacker server     ← x402-secure: NOT triggered│
+│ 4. Credentials stolen                 ← TOO LATE            │
+└─────────────────────────────────────────────────────────────┘
 
-**"skill.md is an unsigned binary"** — We scanned 286 ClawdHub skills and found credential stealers disguised as legitimate tools.
+WITH x402guard:
+┌─────────────────────────────────────────────────────────────┐
+│ 1. User requests x402guard audit      ← Before install      │
+│ 2. x402guard scans skill content      ← Detects malware     │
+│ 3. Returns: BLOCKED (credential_theft)← User warned         │
+│ 4. Skill NOT installed                ← PROTECTED           │
+└─────────────────────────────────────────────────────────────┘
+```
 
-## 🚀 Quickstart: SDK Integration
+## Security Layers
+
+x402guard is **Layer 2** in the AI agent security stack:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ LAYER 4: x402-secure     │ Payment authorization            │
+│                          │ When: Each transaction           │
+├──────────────────────────┼──────────────────────────────────┤
+│ LAYER 3: tAudit          │ Runtime code integrity           │
+│                          │ When: SDK initialization         │
+├──────────────────────────┼──────────────────────────────────┤
+│ LAYER 2: x402guard  ←    │ Pre-install skill auditing       │
+│                          │ When: Before installation        │
+├──────────────────────────┼──────────────────────────────────┤
+│ LAYER 1: ERC-8004        │ Agent identity                   │
+│                          │ When: Agent creation             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+| Attack Type | x402guard | tAudit | x402-secure |
+|-------------|-----------|--------|-------------|
+| Credential theft (no payment) | Catches | Misses | Misses |
+| Data exfiltration (HTTP POST) | Catches | Misses | Misses |
+| Tampered payment SDK | Misses | Catches | Misses |
+| Unauthorized payment | Misses | Misses | Catches |
+
+## Quick Start
 
 ```bash
-# Install the SDK
-npm install skillguard-client @x402/core @x402/evm
+npm install x402guard-client @x402/core @x402/evm
 ```
 
 ```typescript
-import { SkillGuardClient } from 'skillguard-client';
+import { X402GuardClient } from 'x402guard-client';
 
-// Initialize client
-const client = new SkillGuardClient({
-  privateKey: process.env.PRIVATE_KEY!,
+const client = new X402GuardClient({
+  privateKey: process.env.WALLET_KEY!,
 });
 
-// Audit a skill before installing
 const result = await client.auditSkill({
   skillUrl: 'https://clawdhub.com/skills/weather',
-  tier: 'standard', // $0.15 USDC
+  tier: 'standard',
 });
 
-console.log(result.risk_score);      // 12
-console.log(result.recommendation);   // 'SAFE'
-console.log(result.findings);         // { malware: [], permissions: [...] }
-
-// Quick check
-const safe = await client.isSafe('https://clawdhub.com/skills/ssh-helper');
-if (safe) {
-  // Proceed with installation
+if (result.recommendation === 'BLOCKED') {
+  console.log('Malicious skill detected:', result.findings.malware);
+} else if (result.recommendation === 'SAFE') {
+  console.log('Safe to install');
 }
 ```
 
-## 🤔 Why SkillGuard?
+## Pricing
 
-### The Problem
+Pay-per-audit with USDC on Base mainnet. No accounts, no subscriptions.
 
-If you're building an AI agent that installs skills:
+| Tier | Price | Features |
+|------|-------|----------|
+| Quick | $0.05 | YARA malware scan |
+| Standard | $0.15 | + Permission analysis + Network detection |
+| Deep | $0.50 | + Behavioral sandbox + Signed attestation |
 
-- ❓ What if a skill steals your AWS credentials?
-- ❓ How do you know it won't phone home to suspicious servers?
-- ❓ Who's responsible when a malicious skill causes damage?
+## Documentation
 
-### The Solution
+**Core Concepts**
+- [The Problem](./docs/PROBLEM.md) — Why skill security matters
+- [Security Layers](./docs/SECURITY_LAYERS.md) — How x402guard fits in the stack
+- [Skills Explained](./docs/SKILLS_EXPLAINED.md) — What are AI agent skills
 
-SkillGuard provides pre-install security auditing:
+**Guides**
+- [Quickstart](./docs/QUICKSTART.md) — Get started in 5 minutes
+- [SDK Reference](./docs/SDK_REFERENCE.md) — X402GuardClient API
+- [Agent Integration](./docs/AGENT_INTEGRATION.md) — OpenClaw, LangChain, etc.
+- [Deployment](./docs/DEPLOYMENT.md) — Deploy to production
 
-- 🔬 **YARA Scanning**: Detect credential stealers, backdoors, malware
-- 🔐 **Permission Analysis**: What files/network access does it need?
-- 🌐 **Network Detection**: Does it contact suspicious endpoints?
-- 📊 **Risk Scoring**: 0-100 score with clear recommendation
-- 📜 **Attestation**: Signed proof of audit for compliance
+**Reference**
+- [API Reference](./docs/API_REFERENCE.md) — HTTP API documentation
+- [Detection Rules](./docs/DETECTION_RULES.md) — YARA-style patterns
+- [Risk Scoring](./docs/RISK_SCORING.md) — How scores work
+- [Self-Hosting](./docs/SELF_HOSTING.md) — Run your own server
 
-## 📦 Packages
-
-| Package | Description | Install |
-|---------|-------------|---------|
-| `skillguard-client` | SDK for integrating audits | `npm install skillguard-client` |
-| `@skillguard/shared` | Shared types | Internal |
-
-## 🔧 API Endpoints
-
-| Endpoint | Price | Description |
-|----------|-------|-------------|
-| `GET /health` | Free | Health check |
-| `POST /audit/quick` | $0.05 | YARA malware scan |
-| `POST /audit/standard` | $0.15 | Full analysis + permissions |
-| `POST /audit/deep` | $0.50 | Complete audit + sandbox |
-
-### Example Request
-
-```bash
-curl -X POST https://skillguard-api.vercel.app/audit/quick \
-  -H "Content-Type: application/json" \
-  -H "X-Payment: <x402-payment-token>" \
-  -d '{"skill_url": "https://clawdhub.com/skills/weather"}'
-```
-
-### Example Response
-
-```json
-{
-  "risk_score": 12,
-  "risk_level": "LOW",
-  "recommendation": "SAFE",
-  "findings": {
-    "malware": [],
-    "permissions": [{ "type": "network", "target": "api.weather.com" }],
-    "network": [{ "url": "api.weather.com", "external": true }]
-  },
-  "audit_id": "aud_abc123",
-  "tier": "standard"
-}
-```
-
-## 🏗️ Repository Structure
+## Project Structure
 
 ```
-skillguard/
+x402guard/
+├── server/                # Express API server
+│   └── src/
+│       ├── services/      # Audit engine, YARA scanner
+│       └── routes/        # API endpoints
 ├── packages/
-│   ├── skillguard-client/    # npm SDK
-│   └── shared/               # Shared types
-├── server/                   # API server (Express + x402)
-├── docs/                     # Documentation
-├── examples/                 # Integration examples
-└── scripts/                  # Build/deploy scripts
+│   └── x402guard-client/  # TypeScript SDK
+├── examples/              # Usage examples
+└── docs/                  # Documentation
 ```
 
-## 🚀 Self-Hosting
+## Development
 
 ```bash
-# Clone and install
-git clone https://github.com/goheesheng/skillguard.git
-cd skillguard
+# Install dependencies
 pnpm install
 
-# Configure
-cp server/.env.example server/.env
-# Edit server/.env with your wallet address
-
-# Run
+# Start server (runs on localhost:3000)
 pnpm dev:server
+
+# Build
+pnpm build
 ```
 
-See [docs/SELF_HOSTING.md](./docs/SELF_HOSTING.md) for full guide.
+## Links
 
-## 📖 Documentation
-
-- [Quickstart](./docs/QUICKSTART.md) - Get started in 5 minutes
-- [Agent Integration](./docs/AGENT_INTEGRATION.md) - OpenClaw, LangChain, etc.
-- [API Reference](./docs/API_REFERENCE.md) - Complete API docs
-- [Self-Hosting](./docs/SELF_HOSTING.md) - Run your own server
-
-## 💳 Payment
-
-SkillGuard uses the [x402 protocol](https://x402.org) for payments:
-
-- **Network**: Base (mainnet)
-- **Asset**: USDC
-- **No accounts** - Pay per audit with your agent wallet
-
-## 🤝 Works With
-
-- [x402](https://x402.org) - HTTP-native payments
-- [x402-secure](https://github.com/t54-labs/x402-secure) - Agent payment security
-- [OpenClaw](https://openclaw.ai) - AI agent framework
-- [ClawdHub](https://clawdhub.com) - Agent skill marketplace
-
-## 📄 License
-
-MIT - See [LICENSE](./LICENSE)
+- **x402 Protocol**: https://x402.org
+- **x402-secure (t54)**: https://github.com/t54-labs/x402-secure
+- **ClawdHub**: https://clawdhub.com
 
 ---
 
-Built for the agentic economy 🤖💰
+Copyright (c) 2026 Eesheng. All rights reserved.
+
+This software is proprietary and confidential. Unauthorized copying, modification, distribution, or use of this software, via any medium, is strictly prohibited without express written permission from the copyright holder.

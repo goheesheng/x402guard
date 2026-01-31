@@ -1,15 +1,15 @@
 # API Reference
 
-Complete API documentation for SkillGuard.
+Complete API documentation for x402guard.
 
 ## Base URL
 
-- **Production**: `https://skillguard-api.vercel.app`
+- **Production**: `https://x402guard.vercel.app`
 - **Self-hosted**: Your deployment URL
 
 ## Authentication
 
-SkillGuard uses [x402](https://x402.org) for payment authentication. Include the `X-Payment` header with a valid x402 payment token.
+x402guard uses [x402](https://x402.org) for payment authentication. Include the `X-Payment` header with a valid x402 payment token.
 
 ## Endpoints
 
@@ -25,7 +25,46 @@ Free endpoint to check API status.
 ```json
 {
   "status": "ok",
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "uptime": 3600
+}
+```
+
+---
+
+### Pricing Info
+
+```
+GET /pricing
+```
+
+Free endpoint returning current pricing.
+
+**Response:**
+```json
+{
+  "tiers": [
+    {
+      "name": "quick",
+      "price": "50000",
+      "priceUSD": 0.05,
+      "features": ["YARA malware scanning", "Risk score", "Recommendation"]
+    },
+    {
+      "name": "standard",
+      "price": "150000",
+      "priceUSD": 0.15,
+      "features": ["All Quick features", "Permission analysis", "Network call detection"]
+    },
+    {
+      "name": "deep",
+      "price": "500000",
+      "priceUSD": 0.50,
+      "features": ["All Standard features", "Behavioral sandbox", "Signed attestation"]
+    }
+  ],
+  "network": "eip155:8453",
+  "asset": "USDC"
 }
 ```
 
@@ -42,11 +81,11 @@ Returns API information and pricing.
 **Response:**
 ```json
 {
-  "name": "SkillGuard API",
+  "name": "x402guard API",
   "version": "0.1.0",
   "description": "x402-powered security auditing for AI agent skills",
   "endpoints": {
-    "free": ["/health"],
+    "free": ["/health", "/pricing"],
     "paid": {
       "/audit/quick": { "price": "$0.05", "description": "YARA malware scan" },
       "/audit/standard": { "price": "$0.15", "description": "Full analysis + permissions + network" },
@@ -80,6 +119,8 @@ Fast YARA-based malware scan.
   "skill_content": "optional raw content"
 }
 ```
+
+**Note:** Provide either `skill_url` OR `skill_content`, not both.
 
 **Response:**
 ```json
@@ -128,7 +169,13 @@ Complete audit with behavioral sandbox analysis and signed attestation.
 **Response includes:**
 ```json
 {
-  "...": "same as standard",
+  "risk_score": 12,
+  "risk_level": "LOW",
+  "recommendation": "SAFE",
+  "findings": { ... },
+  "audit_id": "aud_abc123",
+  "timestamp": "2026-01-31T10:30:00Z",
+  "tier": "deep",
   "attestation": {
     "signature": "0x...",
     "signer": "0x...",
@@ -168,15 +215,48 @@ Complete audit with behavioral sandbox analysis and signed attestation.
 
 ## Error Responses
 
+### 402 Payment Required
+
 ```json
 {
-  "error": "Payment required",
-  "code": "PAYMENT_REQUIRED",
-  "details": "Include X-Payment header with valid x402 token"
+  "accepts": [
+    {
+      "scheme": "exact",
+      "network": "eip155:8453",
+      "maxAmountRequired": "150000",
+      "payTo": "0x...",
+      "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    }
+  ],
+  "error": "Payment Required"
+}
+```
+
+### 400 Bad Request
+
+```json
+{
+  "error": "Invalid request",
+  "details": "Must provide either skill_url or skill_content"
+}
+```
+
+### 500 Server Error
+
+```json
+{
+  "error": "Internal server error",
+  "message": "Please try again later"
 }
 ```
 
 ## Rate Limits
 
-- 100 requests per minute per IP
+- 100 requests per minute per IP (free endpoints)
 - No limits on paid endpoints (rate limited by payment)
+
+## Next Steps
+
+- [SDK Reference](./SDK_REFERENCE.md) - X402GuardClient documentation
+- [Detection Rules](./DETECTION_RULES.md) - What patterns are detected
+- [Risk Scoring](./RISK_SCORING.md) - How scores are calculated

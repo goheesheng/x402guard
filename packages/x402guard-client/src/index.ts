@@ -1,22 +1,22 @@
 /**
- * SkillGuard Client SDK
- * 
+ * x402guard Client SDK
+ *
  * x402-powered security auditing for AI agent skills.
- * 
+ *
  * @example
  * ```ts
- * import { SkillGuardClient } from 'skillguard-client';
- * 
- * const client = new SkillGuardClient({
- *   apiUrl: 'https://skillguard-api.vercel.app',
+ * import { X402GuardClient } from 'x402guard-client';
+ *
+ * const client = new X402GuardClient({
+ *   apiUrl: 'https://x402guard.vercel.app',
  *   privateKey: process.env.PRIVATE_KEY,
  * });
- * 
+ *
  * const result = await client.auditSkill({
  *   skillUrl: 'https://clawdhub.com/skills/weather',
  *   tier: 'standard',
  * });
- * 
+ *
  * console.log(result.risk_level); // 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
  * ```
  */
@@ -29,8 +29,8 @@ export type AuditTier = 'quick' | 'standard' | 'deep';
 export type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 export type Recommendation = 'SAFE' | 'CAUTION' | 'DANGEROUS' | 'BLOCKED';
 
-export interface SkillGuardConfig {
-  /** SkillGuard API URL (default: https://skillguard-api.vercel.app) */
+export interface X402GuardConfig {
+  /** x402guard API URL (default: https://x402guard.vercel.app) */
   apiUrl?: string;
   /** Private key for x402 payments (hex string with 0x prefix) */
   privateKey: string;
@@ -105,19 +105,19 @@ export const PRICING = {
   deep: { price: 500000, usd: 0.50 },
 } as const;
 
-export const DEFAULT_API_URL = 'https://skillguard-api.vercel.app';
+export const DEFAULT_API_URL = 'https://x402guard.vercel.app';
 
 // =============================================================================
 // Client
 // =============================================================================
 
-export class SkillGuardClient {
+export class X402GuardClient {
   private apiUrl: string;
   private privateKey: string;
   private network: 'mainnet' | 'testnet';
   private fetchWithPayment: typeof fetch | null = null;
 
-  constructor(config: SkillGuardConfig) {
+  constructor(config: X402GuardConfig) {
     this.apiUrl = config.apiUrl || DEFAULT_API_URL;
     this.privateKey = config.privateKey;
     this.network = config.network || 'mainnet';
@@ -156,21 +156,21 @@ export class SkillGuardClient {
 
   /**
    * Audit a skill for security issues
-   * 
+   *
    * @param request - Audit request with skill URL/content and tier
    * @returns Audit result with risk score, findings, and recommendation
-   * 
+   *
    * @example
    * ```ts
    * const result = await client.auditSkill({
    *   skillUrl: 'https://clawdhub.com/skills/weather',
    *   tier: 'standard',
    * });
-   * 
+   *
    * if (result.recommendation === 'SAFE') {
-   *   console.log('✅ Safe to install');
+   *   console.log('Safe to install');
    * } else {
-   *   console.log('⚠️ Review findings:', result.findings);
+   *   console.log('Review findings:', result.findings);
    * }
    * ```
    */
@@ -218,12 +218,12 @@ export class SkillGuardClient {
 
   /**
    * Check if a skill is safe to install
-   * 
+   *
    * @returns true if recommendation is SAFE or CAUTION with low risk
    */
   async isSafe(skillUrl: string, tier: AuditTier = 'standard'): Promise<boolean> {
     const result = await this.auditSkill({ skillUrl, tier });
-    return result.recommendation === 'SAFE' || 
+    return result.recommendation === 'SAFE' ||
            (result.recommendation === 'CAUTION' && result.risk_score < 30);
   }
 }
@@ -234,11 +234,11 @@ export class SkillGuardClient {
 
 /**
  * Quick one-shot audit without creating a client instance
- * 
+ *
  * @example
  * ```ts
- * import { auditSkill } from 'skillguard-client';
- * 
+ * import { auditSkill } from 'x402guard-client';
+ *
  * const result = await auditSkill({
  *   skillUrl: 'https://clawdhub.com/skills/weather',
  *   privateKey: process.env.PRIVATE_KEY!,
@@ -252,11 +252,11 @@ export async function auditSkill(options: {
   privateKey: string;
   apiUrl?: string;
 }): Promise<AuditResult> {
-  const client = new SkillGuardClient({
+  const client = new X402GuardClient({
     privateKey: options.privateKey,
     apiUrl: options.apiUrl,
   });
-  
+
   return client.auditSkill({
     skillUrl: options.skillUrl,
     skillContent: options.skillContent,
@@ -264,5 +264,11 @@ export async function auditSkill(options: {
   });
 }
 
+// Backward compatibility alias (deprecated)
+/** @deprecated Use X402GuardClient instead */
+export const SkillGuardClient = X402GuardClient;
+/** @deprecated Use X402GuardConfig instead */
+export type SkillGuardConfig = X402GuardConfig;
+
 // Default export
-export default SkillGuardClient;
+export default X402GuardClient;

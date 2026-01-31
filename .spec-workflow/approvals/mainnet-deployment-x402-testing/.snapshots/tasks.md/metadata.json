@@ -1,0 +1,22 @@
+{
+  "filePath": ".spec-workflow/specs/mainnet-deployment-x402-testing/tasks.md",
+  "currentVersion": 2,
+  "snapshots": [
+    {
+      "version": 1,
+      "filename": "snapshot-001.json",
+      "timestamp": "2026-01-31T13:09:19.676Z",
+      "trigger": "initial",
+      "approvalId": "approval_1769864959675_odnvdpjgu",
+      "approvalTitle": "Tasks: Mainnet Deployment & x402 Testing"
+    },
+    {
+      "version": 2,
+      "filename": "snapshot-002.json",
+      "timestamp": "2026-01-31T13:09:38.493Z",
+      "trigger": "approved",
+      "approvalId": "approval_1769864959675_odnvdpjgu",
+      "approvalTitle": "Tasks: Mainnet Deployment & x402 Testing"
+    }
+  ]
+}

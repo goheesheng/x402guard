@@ -1,6 +1,6 @@
 # Quickstart
 
-Get started with SkillGuard in 5 minutes.
+Get started with x402guard in 5 minutes.
 
 ## Prerequisites
 
@@ -11,7 +11,7 @@ Get started with SkillGuard in 5 minutes.
 ## Installation
 
 ```bash
-npm install skillguard-client @x402/core @x402/evm
+npm install x402guard-client @x402/core @x402/evm
 ```
 
 ## Usage
@@ -19,9 +19,9 @@ npm install skillguard-client @x402/core @x402/evm
 ### 1. Basic Audit
 
 ```typescript
-import { SkillGuardClient } from 'skillguard-client';
+import { X402GuardClient } from 'x402guard-client';
 
-const client = new SkillGuardClient({
+const client = new X402GuardClient({
   privateKey: process.env.PRIVATE_KEY!,
 });
 
@@ -50,7 +50,7 @@ if (safe) {
 ### 3. Quick One-Shot
 
 ```typescript
-import { auditSkill } from 'skillguard-client';
+import { auditSkill } from 'x402guard-client';
 
 const result = await auditSkill({
   skillUrl: 'https://clawdhub.com/skills/weather',
@@ -62,13 +62,13 @@ const result = await auditSkill({
 
 ```bash
 # Quick audit ($0.05)
-curl -X POST https://skillguard-api.vercel.app/audit/quick \
+curl -X POST https://x402guard.vercel.app/audit/quick \
   -H "Content-Type: application/json" \
   -H "X-Payment: <x402-payment-token>" \
   -d '{"skill_url": "https://clawdhub.com/skills/weather"}'
 
 # Standard audit ($0.15)
-curl -X POST https://skillguard-api.vercel.app/audit/standard \
+curl -X POST https://x402guard.vercel.app/audit/standard \
   -H "Content-Type: application/json" \
   -H "X-Payment: <x402-payment-token>" \
   -d '{"skill_url": "https://clawdhub.com/skills/weather"}'
@@ -95,6 +95,7 @@ curl -X POST https://skillguard-api.vercel.app/audit/standard \
 
 ## Next Steps
 
+- [SDK Reference](./SDK_REFERENCE.md) - Complete X402GuardClient API
 - [Agent Integration](./AGENT_INTEGRATION.md) - Integrate with OpenClaw, LangChain, etc.
-- [API Reference](./API_REFERENCE.md) - Complete API docs
-- [Self-Hosting](./SELF_HOSTING.md) - Run your own server
+- [Detection Rules](./DETECTION_RULES.md) - What patterns are detected
+- [Risk Scoring](./RISK_SCORING.md) - How scores are calculated

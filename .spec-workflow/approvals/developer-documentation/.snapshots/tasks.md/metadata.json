@@ -1,0 +1,22 @@
+{
+  "filePath": ".spec-workflow/specs/developer-documentation/tasks.md",
+  "currentVersion": 2,
+  "snapshots": [
+    {
+      "version": 1,
+      "filename": "snapshot-001.json",
+      "timestamp": "2026-01-31T14:46:50.142Z",
+      "trigger": "initial",
+      "approvalId": "approval_1769870810140_jj98irwym",
+      "approvalTitle": "Tasks: x402guard Developer Documentation"
+    },
+    {
+      "version": 2,
+      "filename": "snapshot-002.json",
+      "timestamp": "2026-01-31T14:49:35.760Z",
+      "trigger": "approved",
+      "approvalId": "approval_1769870810140_jj98irwym",
+      "approvalTitle": "Tasks: x402guard Developer Documentation"
+    }
+  ]
+}

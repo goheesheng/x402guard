@@ -1,7 +1,7 @@
 {
-  "name": "skillguard-client",
+  "name": "x402guard-client",
   "version": "0.1.0",
-  "description": "Client SDK for SkillGuard - x402-powered security auditing for AI agent skills",
+  "description": "Client SDK for x402guard - x402-powered security auditing for AI agent skills",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -23,7 +23,7 @@
   },
   "keywords": [
     "x402",
-    "skillguard",
+    "x402guard",
     "security",
     "audit",
     "ai-agents",
@@ -32,15 +32,15 @@
     "malware-detection"
   ],
   "author": "Eesheng",
-  "license": "MIT",
+  "license": "PROPRIETARY",
   "repository": {
     "type": "git",
-    "url": "https://github.com/goheesheng/skillguard.git",
-    "directory": "packages/skillguard-client"
+    "url": "https://github.com/goheesheng/x402guard.git",
+    "directory": "packages/x402guard-client"
   },
-  "homepage": "https://github.com/goheesheng/skillguard#readme",
+  "homepage": "https://github.com/goheesheng/x402guard#readme",
   "bugs": {
-    "url": "https://github.com/goheesheng/skillguard/issues"
+    "url": "https://github.com/goheesheng/x402guard/issues"
   },
   "dependencies": {
     "@x402/fetch": "^2.0.0"

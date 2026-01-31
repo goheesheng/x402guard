@@ -53,7 +53,7 @@ fetch('https://webhook.site/test', {
 
 async function main() {
   console.log("=".repeat(60));
-  console.log("x402 Payment Flow Test");
+  console.log("x402guard Payment Flow Test");
   console.log("=".repeat(60));
   console.log(`API URL: ${API_URL}`);
   console.log(`Network: Base Mainnet (eip155:8453)`);
@@ -75,9 +75,9 @@ async function main() {
     const health = await healthRes.json();
     console.log(`   Status: ${health.status}`);
     console.log(`   Version: ${health.version}`);
-    console.log("   ✅ Health check passed");
+    console.log("   Health check passed");
   } catch (error: any) {
-    console.log(`   ❌ Health check failed: ${error.message}`);
+    console.log(`   Health check failed: ${error.message}`);
     return;
   }
 
@@ -93,7 +93,7 @@ async function main() {
 
     if (!auditRes.ok) {
       const error = await auditRes.text();
-      console.log(`   ❌ Audit failed (${auditRes.status}): ${error}`);
+      console.log(`   Audit failed (${auditRes.status}): ${error}`);
       return;
     }
 
@@ -103,13 +103,13 @@ async function main() {
     console.log(`   Risk Level: ${result.risk_level}`);
     console.log(`   Recommendation: ${result.recommendation}`);
     console.log(`   Malware Matches: ${result.findings.malware.length}`);
-    console.log("   ✅ Quick audit completed successfully");
+    console.log("   Quick audit completed successfully");
 
     if (result.recommendation !== "SAFE") {
-      console.log("   ⚠️  Expected SAFE recommendation for clean skill");
+      console.log("   WARNING: Expected SAFE recommendation for clean skill");
     }
   } catch (error: any) {
-    console.log(`   ❌ Quick audit failed: ${error.message}`);
+    console.log(`   Quick audit failed: ${error.message}`);
     return;
   }
 
@@ -125,7 +125,7 @@ async function main() {
 
     if (!auditRes.ok) {
       const error = await auditRes.text();
-      console.log(`   ❌ Audit failed (${auditRes.status}): ${error}`);
+      console.log(`   Audit failed (${auditRes.status}): ${error}`);
       return;
     }
 
@@ -143,13 +143,13 @@ async function main() {
       }
     }
 
-    console.log("   ✅ Standard audit completed successfully");
+    console.log("   Standard audit completed successfully");
 
     if (result.recommendation === "SAFE") {
-      console.log("   ⚠️  Expected DANGEROUS/BLOCKED for malicious skill");
+      console.log("   WARNING: Expected DANGEROUS/BLOCKED for malicious skill");
     }
   } catch (error: any) {
-    console.log(`   ❌ Standard audit failed: ${error.message}`);
+    console.log(`   Standard audit failed: ${error.message}`);
     return;
   }
 

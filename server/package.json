@@ -1,5 +1,5 @@
 {
-  "name": "@skillguard/server",
+  "name": "@x402guard/server",
   "version": "0.1.0",
   "description": "x402-powered security auditing API for agent skills",
   "type": "module",
@@ -15,6 +15,7 @@
   },
   "keywords": [
     "x402",
+    "x402guard",
     "security",
     "audit",
     "agents",
@@ -22,7 +23,7 @@
     "yara"
   ],
   "author": "Eesheng",
-  "license": "MIT",
+  "license": "PROPRIETARY",
   "dependencies": {
     "@coinbase/x402": "^2.1.0",
     "@x402/core": "^2.0.0",

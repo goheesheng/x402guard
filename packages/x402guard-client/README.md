@@ -1,19 +1,19 @@
-# skillguard-client
+# x402guard-client
 
-Client SDK for SkillGuard - x402-powered security auditing for AI agent skills.
+Client SDK for x402guard - x402-powered security auditing for AI agent skills.
 
 ## Installation
 
 ```bash
-npm install skillguard-client @x402/core @x402/evm
+npm install x402guard-client @x402/core @x402/evm
 ```
 
 ## Quick Start
 
 ```typescript
-import { SkillGuardClient } from 'skillguard-client';
+import { X402GuardClient } from 'x402guard-client';
 
-const client = new SkillGuardClient({
+const client = new X402GuardClient({
   privateKey: process.env.PRIVATE_KEY!,
 });
 
@@ -38,11 +38,11 @@ console.log(result.findings);         // { malware, permissions, network, creden
 
 ## API
 
-### `SkillGuardClient`
+### `X402GuardClient`
 
 ```typescript
-const client = new SkillGuardClient({
-  apiUrl: 'https://skillguard-api.vercel.app', // optional
+const client = new X402GuardClient({
+  apiUrl: 'https://x402guard.vercel.app', // optional
   privateKey: '0x...', // required for x402 payments
   network: 'mainnet', // 'mainnet' | 'testnet'
 });
@@ -69,7 +69,7 @@ const safe = await client.isSafe(skillUrl);
 ## One-Shot Audit
 
 ```typescript
-import { auditSkill } from 'skillguard-client';
+import { auditSkill } from 'x402guard-client';
 
 const result = await auditSkill({
   skillUrl: 'https://clawdhub.com/skills/weather',
@@ -77,6 +77,16 @@ const result = await auditSkill({
   tier: 'standard',
 });
 ```
+
+## Backward Compatibility
+
+For users migrating from older versions, `SkillGuardClient` is available as a deprecated alias:
+
+```typescript
+import { SkillGuardClient } from 'x402guard-client'; // @deprecated
+```
+
+Please update to use `X402GuardClient` instead.
 
 ## License
 
