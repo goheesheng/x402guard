@@ -1,61 +1,99 @@
 /**
  * x402 Payment Middleware
- * 
+ *
  * This middleware gates the /audit endpoint behind x402 payments.
  * Supports tiered pricing: quick ($0.05), standard ($0.15), deep ($0.50)
  */
 
 import { paymentMiddleware } from "@x402/express";
+import { x402ResourceServer, HTTPFacilitatorClient } from "@x402/core/server";
+import { registerExactEvmScheme } from "@x402/evm/exact/server";
+import { createFacilitatorConfig } from "@coinbase/x402";
 import { config } from "../config/index.js";
 
 // Pricing in USDC atomic units (6 decimals)
 // $0.05 = 50000, $0.15 = 150000, $0.50 = 500000
 export const TIER_PRICES = {
   quick: 50000n,    // $0.05 USDC
-  standard: 150000n, // $0.15 USDC  
+  standard: 150000n, // $0.15 USDC
   deep: 500000n,     // $0.50 USDC
 } as const;
 
 export type AuditTier = keyof typeof TIER_PRICES;
 
-// USDC contract address on Base
-const USDC_BASE = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
-const USDC_BASE_SEPOLIA = "0x036CbD53842c5426634e7929541eC2318f3dCF7e";
+// Create facilitator config with CDP credentials
+const facilitatorConfig = createFacilitatorConfig(
+  config.CDP_API_KEY_ID,
+  config.CDP_API_KEY_SECRET
+);
 
-// Get USDC address based on network
-const getUsdcAddress = () => {
-  return config.X402_NETWORK.includes("8453") ? USDC_BASE : USDC_BASE_SEPOLIA;
-};
+// Create HTTP facilitator client with authenticated config
+const facilitatorClient = new HTTPFacilitatorClient(facilitatorConfig);
 
-/**
- * Create x402 payment configuration for the audit endpoint
- */
-export function createPaymentConfig(tier: AuditTier = "quick") {
-  const price = TIER_PRICES[tier];
-  
-  return {
-    maxAmountRequired: price.toString(),
-    resource: `${config.BASE_URL}/audit`,
-    payTo: config.X402_PAY_TO_ADDRESS,
-    network: config.X402_NETWORK,
-    asset: getUsdcAddress(),
-    description: `SkillGuard security audit (${tier} tier)`,
-  };
-}
+// Create x402 resource server with authenticated facilitator client
+const x402Server = new x402ResourceServer(facilitatorClient);
+registerExactEvmScheme(x402Server);
 
 /**
  * Express middleware factory for x402-protected routes
  * Uses the standard @x402/express middleware
  */
 export function createX402Middleware(): any {
+  const PAY_TO = config.X402_PAY_TO_ADDRESS;
+  const NETWORK = config.X402_NETWORK as `${string}:${string}`;
+
   return paymentMiddleware(
-    config.X402_PAY_TO_ADDRESS as any,
     {
-      "POST /audit": createPaymentConfig("quick"),
-    } as any,
-    {
-      url: config.X402_FACILITATOR_URL,
-    } as any
+      "POST /audit/quick": {
+        accepts: [
+          {
+            scheme: "exact",
+            price: "$0.05",
+            network: NETWORK,
+            payTo: PAY_TO,
+          },
+        ],
+        description: "Quick YARA malware scan",
+        mimeType: "application/json",
+      },
+      "POST /audit/standard": {
+        accepts: [
+          {
+            scheme: "exact",
+            price: "$0.15",
+            network: NETWORK,
+            payTo: PAY_TO,
+          },
+        ],
+        description: "Standard security analysis with permissions and network detection",
+        mimeType: "application/json",
+      },
+      "POST /audit/deep": {
+        accepts: [
+          {
+            scheme: "exact",
+            price: "$0.50",
+            network: NETWORK,
+            payTo: PAY_TO,
+          },
+        ],
+        description: "Deep comprehensive security audit with behavioral sandbox",
+        mimeType: "application/json",
+      },
+      "POST /audit": {
+        accepts: [
+          {
+            scheme: "exact",
+            price: "$0.05",
+            network: NETWORK,
+            payTo: PAY_TO,
+          },
+        ],
+        description: "Security audit (default: quick tier)",
+        mimeType: "application/json",
+      },
+    },
+    x402Server,
   );
 }
 
@@ -70,7 +108,7 @@ export function getPricingInfo() {
       features: ["Malware signature detection", "Basic pattern matching"],
     },
     standard: {
-      price: "$0.15", 
+      price: "$0.15",
       description: "YARA + permissions + network analysis",
       features: ["All quick features", "Permission analysis", "Network call detection", "Dependency scanning"],
     },

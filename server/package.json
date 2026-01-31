@@ -13,10 +13,18 @@
     "lint": "eslint src/",
     "typecheck": "tsc --noEmit"
   },
-  "keywords": ["x402", "security", "audit", "agents", "skills", "yara"],
+  "keywords": [
+    "x402",
+    "security",
+    "audit",
+    "agents",
+    "skills",
+    "yara"
+  ],
   "author": "Eesheng",
   "license": "MIT",
   "dependencies": {
+    "@coinbase/x402": "^2.1.0",
     "@x402/core": "^2.0.0",
     "@x402/evm": "^2.0.0",
     "@x402/express": "^2.0.0",
