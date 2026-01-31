@@ -1,12 +1,12 @@
-import express from "express";
+import express, { Express } from "express";
 import { logger } from "./utils/logger.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import healthRouter from "./routes/health.js";
 import pricingRouter from "./routes/pricing.js";
 import auditRouter from "./routes/audit.js";
 
-export function createServer() {
-  const app = express();
+export function createServer(): Express {
+  const app: Express = express();
   
   // Middleware
   app.use(express.json({ limit: "2mb" }));

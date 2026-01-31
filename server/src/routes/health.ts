@@ -1,7 +1,8 @@
 import { Router } from "express";
+import type { Router as RouterType } from "express";
 import type { HealthResponse } from "../types/api.js";
 
-const router = Router();
+const router: RouterType = Router();
 const startTime = Date.now();
 
 router.get("/health", (_req: any, res: any) => {

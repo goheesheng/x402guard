@@ -1,9 +1,10 @@
 import "dotenv/config";
+import type { Express } from "express";
 import { createServer } from "./server.js";
 import { config } from "./config/index.js";
 import { logger } from "./utils/logger.js";
 
-const app = createServer();
+const app: Express = createServer();
 
 // For local development
 if (process.env.NODE_ENV !== "production") {

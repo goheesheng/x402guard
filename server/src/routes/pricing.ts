@@ -1,8 +1,9 @@
 import { Router } from "express";
+import type { Router as RouterType } from "express";
 import { config } from "../config/index.js";
 import type { PricingResponse } from "../types/api.js";
 
-const router = Router();
+const router: RouterType = Router();
 
 router.get("/pricing", (_req: any, res: any) => {
   const response: PricingResponse = {

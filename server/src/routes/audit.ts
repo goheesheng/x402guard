@@ -1,4 +1,5 @@
 import { Router } from "express";
+import type { Router as RouterType } from "express";
 import { z } from "zod";
 import { nanoid } from "nanoid";
 import { AppError } from "../middleware/errorHandler.js";
@@ -7,7 +8,7 @@ import { config } from "../config/index.js";
 import { createX402Middleware, getPricingInfo } from "../middleware/x402.js";
 import type { AuditResponse } from "../types/api.js";
 
-const router = Router();
+const router: RouterType = Router();
 
 // Request validation schema
 const auditRequestSchema = z.object({
