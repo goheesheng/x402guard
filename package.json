@@ -2,21 +2,25 @@
   "name": "skillguard",
   "version": "1.0.0",
   "private": true,
-  "description": "SkillGuard - x402-powered security auditing for AI agent skills",
+  "description": "Open-Source SDK & Server for Secure Agent Skill Auditing on x402",
   "packageManager": "pnpm@9.15.0",
   "scripts": {
     "dev": "turbo dev",
+    "dev:server": "pnpm --filter @skillguard/server dev",
+    "dev:client": "pnpm --filter skillguard-client dev",
     "build": "turbo build",
-    "lint": "turbo lint",
+    "build:server": "pnpm --filter @skillguard/server build",
+    "build:client": "pnpm --filter skillguard-client build",
     "test": "turbo test",
+    "lint": "turbo lint",
     "clean": "turbo clean && rm -rf node_modules",
-    "dev:web": "pnpm --filter @skillguard/web dev",
-    "dev:api": "pnpm --filter @skillguard/api dev",
-    "build:web": "pnpm --filter @skillguard/web build",
-    "build:api": "pnpm --filter @skillguard/api build"
+    "typecheck": "turbo typecheck"
   },
   "devDependencies": {
     "turbo": "^2.3.0",
     "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   }
 }

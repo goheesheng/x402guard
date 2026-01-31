@@ -1,7 +1,7 @@
 {
-  "name": "@skillguard/api",
+  "name": "@skillguard/server",
   "version": "0.1.0",
-  "description": "x402-powered security auditing for agent skills",
+  "description": "x402-powered security auditing API for agent skills",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
@@ -17,7 +17,6 @@
   "author": "Eesheng",
   "license": "MIT",
   "dependencies": {
-    "@skillguard/shared": "workspace:*",
     "@x402/core": "^2.0.0",
     "@x402/evm": "^2.0.0",
     "@x402/express": "^2.0.0",

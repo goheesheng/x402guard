@@ -1,0 +1,58 @@
+{
+  "name": "skillguard-client",
+  "version": "0.1.0",
+  "description": "Client SDK for SkillGuard - x402-powered security auditing for AI agent skills",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "x402",
+    "skillguard",
+    "security",
+    "audit",
+    "ai-agents",
+    "skills",
+    "yara",
+    "malware-detection"
+  ],
+  "author": "Eesheng",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/goheesheng/skillguard.git",
+    "directory": "packages/skillguard-client"
+  },
+  "homepage": "https://github.com/goheesheng/skillguard#readme",
+  "bugs": {
+    "url": "https://github.com/goheesheng/skillguard/issues"
+  },
+  "dependencies": {
+    "@x402/fetch": "^2.0.0"
+  },
+  "peerDependencies": {
+    "@x402/core": "^2.0.0",
+    "@x402/evm": "^2.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

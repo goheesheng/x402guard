@@ -1,54 +1,94 @@
-# SkillGuard 🛡️
+# SkillGuard
 
-x402-powered security auditing for AI agent skills.
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Node](https://img.shields.io/badge/Node-20+-green.svg)](https://nodejs.org)
 
-## Structure
+Open-Source SDK & Server for Secure Agent Skill Auditing on x402
 
-```
-skillguard/
-├── apps/
-│   ├── web/          # Next.js frontend (skillscan-web)
-│   └── api/          # Express API (skillguard-api)
-├── packages/
-│   └── shared/       # Shared types and utilities
-├── package.json      # Workspace root
-└── turbo.json        # Turborepo config
-```
+🚀 **Production API Available**: [https://skillguard-api.vercel.app](https://skillguard-api.vercel.app)
 
-## Quick Start
+## 🌟 The SkillGuard Stack
+
+SkillGuard fills the missing **Layer 2 (Code Security)** of the agentic trust stack:
+
+| Layer | Component | Status |
+|-------|-----------|--------|
+| Layer 4 | Payment Security | x402-secure ✓ |
+| Layer 3 | Runtime Behavior | Trustline ✓ |
+| **Layer 2** | **Code Security** | **SkillGuard ★** |
+| Layer 1 | Identity | ERC-8004 ◐ |
+
+**"skill.md is an unsigned binary"** — We scanned 286 ClawdHub skills and found credential stealers disguised as legitimate tools.
+
+## 🚀 Quickstart: SDK Integration
 
 ```bash
-# Install dependencies
-pnpm install
-
-# Run all apps in dev mode
-pnpm dev
-
-# Or run individually
-pnpm dev:web   # http://localhost:3001
-pnpm dev:api   # http://localhost:3000
-
-# Build all
-pnpm build
+# Install the SDK
+npm install skillguard-client @x402/core @x402/evm
 ```
 
-## Apps
+```typescript
+import { SkillGuardClient } from 'skillguard-client';
 
-### @skillguard/web
-Landing page and scan interface at [skillscan-web.vercel.app](https://skillscan-web.vercel.app)
+// Initialize client
+const client = new SkillGuardClient({
+  privateKey: process.env.PRIVATE_KEY!,
+});
 
-### @skillguard/api  
-x402 API at [skillguard-api.vercel.app](https://skillguard-api.vercel.app)
+// Audit a skill before installing
+const result = await client.auditSkill({
+  skillUrl: 'https://clawdhub.com/skills/weather',
+  tier: 'standard', // $0.15 USDC
+});
 
-**Endpoints:**
-- `GET /health` - Free health check
-- `POST /audit/quick` - $0.05 USDC - YARA scan
-- `POST /audit/standard` - $0.15 USDC - Full analysis
-- `POST /audit/deep` - $0.50 USDC - Complete audit
+console.log(result.risk_score);      // 12
+console.log(result.recommendation);   // 'SAFE'
+console.log(result.findings);         // { malware: [], permissions: [...] }
 
-## x402 Payment
+// Quick check
+const safe = await client.isSafe('https://clawdhub.com/skills/ssh-helper');
+if (safe) {
+  // Proceed with installation
+}
+```
 
-Payments accepted in USDC on Base mainnet via x402 protocol.
+## 🤔 Why SkillGuard?
+
+### The Problem
+
+If you're building an AI agent that installs skills:
+
+- ❓ What if a skill steals your AWS credentials?
+- ❓ How do you know it won't phone home to suspicious servers?
+- ❓ Who's responsible when a malicious skill causes damage?
+
+### The Solution
+
+SkillGuard provides pre-install security auditing:
+
+- 🔬 **YARA Scanning**: Detect credential stealers, backdoors, malware
+- 🔐 **Permission Analysis**: What files/network access does it need?
+- 🌐 **Network Detection**: Does it contact suspicious endpoints?
+- 📊 **Risk Scoring**: 0-100 score with clear recommendation
+- 📜 **Attestation**: Signed proof of audit for compliance
+
+## 📦 Packages
+
+| Package | Description | Install |
+|---------|-------------|---------|
+| `skillguard-client` | SDK for integrating audits | `npm install skillguard-client` |
+| `@skillguard/shared` | Shared types | Internal |
+
+## 🔧 API Endpoints
+
+| Endpoint | Price | Description |
+|----------|-------|-------------|
+| `GET /health` | Free | Health check |
+| `POST /audit/quick` | $0.05 | YARA malware scan |
+| `POST /audit/standard` | $0.15 | Full analysis + permissions |
+| `POST /audit/deep` | $0.50 | Complete audit + sandbox |
+
+### Example Request
 
 ```bash
 curl -X POST https://skillguard-api.vercel.app/audit/quick \
@@ -57,15 +97,80 @@ curl -X POST https://skillguard-api.vercel.app/audit/quick \
   -d '{"skill_url": "https://clawdhub.com/skills/weather"}'
 ```
 
-## Environment Variables
+### Example Response
 
-### API (.env)
+```json
+{
+  "risk_score": 12,
+  "risk_level": "LOW",
+  "recommendation": "SAFE",
+  "findings": {
+    "malware": [],
+    "permissions": [{ "type": "network", "target": "api.weather.com" }],
+    "network": [{ "url": "api.weather.com", "external": true }]
+  },
+  "audit_id": "aud_abc123",
+  "tier": "standard"
+}
 ```
-X402_PAY_TO_ADDRESS=0x...     # Your wallet address
-X402_NETWORK=eip155:8453       # Base mainnet
-X402_FACILITATOR_URL=https://api.cdp.coinbase.com/platform/v2/x402
+
+## 🏗️ Repository Structure
+
+```
+skillguard/
+├── packages/
+│   ├── skillguard-client/    # npm SDK
+│   └── shared/               # Shared types
+├── server/                   # API server (Express + x402)
+├── docs/                     # Documentation
+├── examples/                 # Integration examples
+└── scripts/                  # Build/deploy scripts
 ```
 
-## License
+## 🚀 Self-Hosting
 
-MIT
+```bash
+# Clone and install
+git clone https://github.com/goheesheng/skillguard.git
+cd skillguard
+pnpm install
+
+# Configure
+cp server/.env.example server/.env
+# Edit server/.env with your wallet address
+
+# Run
+pnpm dev:server
+```
+
+See [docs/SELF_HOSTING.md](./docs/SELF_HOSTING.md) for full guide.
+
+## 📖 Documentation
+
+- [Quickstart](./docs/QUICKSTART.md) - Get started in 5 minutes
+- [Agent Integration](./docs/AGENT_INTEGRATION.md) - OpenClaw, LangChain, etc.
+- [API Reference](./docs/API_REFERENCE.md) - Complete API docs
+- [Self-Hosting](./docs/SELF_HOSTING.md) - Run your own server
+
+## 💳 Payment
+
+SkillGuard uses the [x402 protocol](https://x402.org) for payments:
+
+- **Network**: Base (mainnet)
+- **Asset**: USDC
+- **No accounts** - Pay per audit with your agent wallet
+
+## 🤝 Works With
+
+- [x402](https://x402.org) - HTTP-native payments
+- [x402-secure](https://github.com/t54-labs/x402-secure) - Agent payment security
+- [OpenClaw](https://openclaw.ai) - AI agent framework
+- [ClawdHub](https://clawdhub.com) - Agent skill marketplace
+
+## 📄 License
+
+MIT - See [LICENSE](./LICENSE)
+
+---
+
+Built for the agentic economy 🤖💰
