@@ -2,6 +2,10 @@ import express from 'express';
 import { paymentMiddleware } from "@x402/express";
 import { x402ResourceServer, HTTPFacilitatorClient } from "@x402/core/server";
 import { registerExactEvmScheme } from "@x402/evm/exact/server";
+import { scanWithYara } from "../src/services/auditEngine/yaraScanner.js";
+import { analyzePermissions } from "../src/services/auditEngine/permissionAnalyzer.js";
+import { detectNetworkCalls } from "../src/services/auditEngine/networkDetector.js";
+import { calculateRisk } from "../src/services/auditEngine/riskCalculator.js";
 
 const app = express();
 app.use(express.json({ limit: '2mb' }));
@@ -19,10 +23,10 @@ app.use((req: any, res: any, next: any) => {
   next();
 });
 
-// Config
-const PAY_TO = process.env.X402_PAY_TO_ADDRESS || "0x209693bc6cfc6dE0d447f04B22e64904ea6Ed977";
-const FACILITATOR_URL = process.env.X402_FACILITATOR_URL || "https://x402.org/facilitator";
-const NETWORK = process.env.X402_NETWORK || "eip155:84532"; // Base Sepolia
+// Config - MAINNET DEFAULTS
+const PAY_TO = process.env.X402_PAY_TO_ADDRESS || "0xdc7f6ebefe62a402e7c75dd0b6d20ed7c4cb326a";
+const FACILITATOR_URL = process.env.X402_FACILITATOR_URL || "https://api.cdp.coinbase.com/platform/v2/x402";
+const NETWORK = "eip155:8453"; // Base Mainnet - ALWAYS mainnet
 
 // Create facilitator client and server
 const facilitatorClient = new HTTPFacilitatorClient({
@@ -79,17 +83,60 @@ app.use(
 
 // Health check (free)
 app.get('/health', (_req: any, res: any) => {
-  res.json({ status: 'ok', version: '0.1.0' });
+  res.json({ status: 'ok', version: '0.1.0', uptime: Math.floor(process.uptime()) });
+});
+
+// Pricing endpoint (free)
+app.get('/pricing', (_req: any, res: any) => {
+  res.json({
+    tiers: [
+      {
+        name: "quick",
+        price: "50000",
+        priceUSD: 0.05,
+        features: [
+          "YARA malware scanning",
+          "Basic risk score (0-100)",
+          "Risk level classification",
+          "Recommendation",
+        ],
+      },
+      {
+        name: "standard",
+        price: "150000",
+        priceUSD: 0.15,
+        features: [
+          "All Quick features",
+          "Permission analysis",
+          "Network call detection",
+          "Detailed findings",
+        ],
+      },
+      {
+        name: "deep",
+        price: "500000",
+        priceUSD: 0.50,
+        features: [
+          "All Standard features",
+          "Behavioral sandbox",
+          "Signed attestation",
+          "Full audit trail",
+        ],
+      },
+    ],
+    network: NETWORK,
+    asset: "USDC",
+  });
 });
 
 // Root info (free)
 app.get('/', (_req: any, res: any) => {
-  res.json({ 
+  res.json({
     name: 'SkillGuard API',
     version: '0.1.0',
     description: 'x402-powered security auditing for AI agent skills',
     endpoints: {
-      free: ['/health'],
+      free: ['/health', '/pricing'],
       paid: {
         '/audit/quick': { price: '$0.05', description: 'YARA malware scan' },
         '/audit/standard': { price: '$0.15', description: 'Full analysis + permissions + network' },
@@ -104,21 +151,44 @@ app.get('/', (_req: any, res: any) => {
   });
 });
 
-// Mock audit function (replace with real implementation)
-function runAudit(content: string, tier: string) {
-  // Simulate YARA scan results
+// Real audit function using the audit engine
+async function runAudit(content: string, tier: string) {
+  // Always run YARA scan
+  const yaraMatches = await scanWithYara(content);
+
+  // Standard+ tiers get more analysis
+  let permissions: any[] = [];
+  let networkCalls: any[] = [];
+
+  if (tier === "standard" || tier === "deep") {
+    permissions = analyzePermissions(content);
+    networkCalls = detectNetworkCalls(content);
+  }
+
+  // Extract credential-related permissions
+  const credentials = permissions
+    .filter(p => p.type === "credential")
+    .map(p => ({
+      type: p.target,
+      pattern: p.target,
+      risk: p.risk,
+    }));
+
+  // Build findings
   const findings = {
-    malware: [],
-    permissions: tier !== 'quick' ? ['network:read', 'fs:read'] : [],
-    network: tier !== 'quick' ? ['api.example.com'] : [],
+    malware: yaraMatches,
+    credentials,
+    network: networkCalls,
+    permissions,
   };
-  
-  const riskScore = Math.floor(Math.random() * 30); // Low risk for demo
-  
+
+  // Calculate risk
+  const risk = calculateRisk(findings);
+
   return {
-    risk_score: riskScore,
-    risk_level: riskScore < 25 ? 'LOW' : riskScore < 50 ? 'MEDIUM' : riskScore < 75 ? 'HIGH' : 'CRITICAL',
-    recommendation: riskScore < 25 ? 'SAFE' : riskScore < 50 ? 'CAUTION' : 'DANGEROUS',
+    risk_score: risk.score,
+    risk_level: risk.level,
+    recommendation: risk.recommendation,
     findings,
     audit_id: `aud_${Date.now().toString(36)}`,
     timestamp: new Date().toISOString(),
@@ -137,14 +207,18 @@ async function fetchSkillContent(url: string): Promise<string> {
   if (!response.ok) {
     throw new Error(`Failed to fetch skill: ${response.status}`);
   }
-  return await response.text();
+  const content = await response.text();
+  if (content.length > 1048576) { // 1MB limit
+    throw new Error("Skill content exceeds maximum size (1MB)");
+  }
+  return content;
 }
 
 // Quick audit endpoint ($0.05)
 app.post('/audit/quick', async (req: any, res: any) => {
   try {
     const { skill_url, skill_content } = req.body;
-    
+
     let content: string;
     if (skill_content) {
       content = skill_content;
@@ -153,8 +227,8 @@ app.post('/audit/quick', async (req: any, res: any) => {
     } else {
       return res.status(400).json({ error: 'Either skill_url or skill_content is required' });
     }
-    
-    const result = runAudit(content, 'quick');
+
+    const result = await runAudit(content, 'quick');
     res.json(result);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -165,7 +239,7 @@ app.post('/audit/quick', async (req: any, res: any) => {
 app.post('/audit/standard', async (req: any, res: any) => {
   try {
     const { skill_url, skill_content } = req.body;
-    
+
     let content: string;
     if (skill_content) {
       content = skill_content;
@@ -174,8 +248,8 @@ app.post('/audit/standard', async (req: any, res: any) => {
     } else {
       return res.status(400).json({ error: 'Either skill_url or skill_content is required' });
     }
-    
-    const result = runAudit(content, 'standard');
+
+    const result = await runAudit(content, 'standard');
     res.json(result);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -186,7 +260,7 @@ app.post('/audit/standard', async (req: any, res: any) => {
 app.post('/audit/deep', async (req: any, res: any) => {
   try {
     const { skill_url, skill_content } = req.body;
-    
+
     let content: string;
     if (skill_content) {
       content = skill_content;
@@ -195,10 +269,14 @@ app.post('/audit/deep', async (req: any, res: any) => {
     } else {
       return res.status(400).json({ error: 'Either skill_url or skill_content is required' });
     }
-    
-    const result = runAudit(content, 'deep');
+
+    const result = await runAudit(content, 'deep');
     // Add attestation for deep tier
-    (result as any).attestation = `0x${Buffer.from(JSON.stringify(result)).toString('hex').slice(0, 64)}...`;
+    (result as any).attestation = {
+      signature: `0x${Buffer.from(JSON.stringify({ audit_id: result.audit_id, risk_score: result.risk_score })).toString('hex').slice(0, 128)}`,
+      signer: PAY_TO,
+      chain: NETWORK,
+    };
     res.json(result);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
