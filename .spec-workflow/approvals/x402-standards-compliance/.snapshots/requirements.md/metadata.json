@@ -1,0 +1,30 @@
+{
+  "filePath": ".spec-workflow/specs/x402-standards-compliance/requirements.md",
+  "currentVersion": 3,
+  "snapshots": [
+    {
+      "version": 1,
+      "filename": "snapshot-001.json",
+      "timestamp": "2026-01-31T15:36:06.679Z",
+      "trigger": "initial",
+      "approvalId": "approval_1769873766674_464tqjqnq",
+      "approvalTitle": "x402 Standards Compliance Requirements"
+    },
+    {
+      "version": 2,
+      "filename": "snapshot-002.json",
+      "timestamp": "2026-01-31T15:37:21.340Z",
+      "trigger": "revision_requested",
+      "approvalId": "approval_1769873766674_464tqjqnq",
+      "approvalTitle": "x402 Standards Compliance Requirements"
+    },
+    {
+      "version": 3,
+      "filename": "snapshot-003.json",
+      "timestamp": "2026-01-31T15:38:53.663Z",
+      "trigger": "approved",
+      "approvalId": "approval_1769873879971_owidnrxmj",
+      "approvalTitle": "x402 Standards Compliance Requirements (Updated)"
+    }
+  ]
+}

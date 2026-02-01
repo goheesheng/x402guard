@@ -15,5 +15,16 @@
   "env": {
     "NODE_ENV": "production",
     "X402_NETWORK": "eip155:8453"
-  }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization, X-Payment" },
+        { "key": "Access-Control-Expose-Headers", "value": "X-Payment-Response, X-Payment-Required, PAYMENT-REQUIRED" }
+      ]
+    }
+  ]
 }

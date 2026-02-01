@@ -11,7 +11,7 @@ Get started with x402guard in 5 minutes.
 ## Installation
 
 ```bash
-npm install x402guard-client @x402/core @x402/evm
+npm install x402guard-client @x402/core @x402/evm viem
 ```
 
 ## Usage

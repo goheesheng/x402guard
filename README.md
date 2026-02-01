@@ -59,7 +59,7 @@ x402guard is **Layer 2** in the AI agent security stack:
 ## Quick Start
 
 ```bash
-npm install x402guard-client @x402/core @x402/evm
+npm install x402guard-client @x402/core @x402/evm viem
 ```
 
 ```typescript
@@ -81,6 +81,59 @@ if (result.recommendation === 'BLOCKED') {
 }
 ```
 
+## How Scanning Works
+
+x402guard uses a multi-layer detection engine:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    SKILL CONTENT INPUT                       │
+└─────────────────────────────┬───────────────────────────────┘
+                              │
+        ┌─────────────────────┼─────────────────────┐
+        ▼                     ▼                     ▼
+┌───────────────┐   ┌─────────────────┐   ┌─────────────────┐
+│ YARA Scanner  │   │ Permission      │   │ Network         │
+│               │   │ Analyzer        │   │ Detector        │
+│ 10 rules for: │   │                 │   │                 │
+│ • Cred theft  │   │ • File access   │   │ • External URLs │
+│ • Exfiltration│   │ • Env vars      │   │ • Webhook sites │
+│ • Shells      │   │ • Credentials   │   │ • POST requests │
+│ • Obfuscation │   │ • System calls  │   │ • Tunnels       │
+└───────┬───────┘   └────────┬────────┘   └────────┬────────┘
+        │                    │                     │
+        └────────────────────┼─────────────────────┘
+                             ▼
+                 ┌───────────────────────┐
+                 │   Risk Calculator     │
+                 │                       │
+                 │ Score: 0-100          │
+                 │ Level: LOW → CRITICAL │
+                 └───────────┬───────────┘
+                             ▼
+         ┌───────────────────────────────────────┐
+         │          RECOMMENDATION               │
+         │  SAFE | CAUTION | DANGEROUS | BLOCKED │
+         └───────────────────────────────────────┘
+```
+
+### Detection Rules
+
+| Rule | Severity | What It Catches |
+|------|----------|-----------------|
+| `credential_theft_env` | CRITICAL | `process.env.SECRET`, `Object.keys(process.env)` |
+| `credential_theft_files` | CRITICAL | `.aws/credentials`, `.ssh/id_rsa`, `.env` |
+| `data_exfiltration` | HIGH | `curl --data`, `fetch(...POST)`, `axios.post` |
+| `known_exfil_domains` | HIGH | `webhook.site`, `requestbin`, `ngrok.io` |
+| `reverse_shell` | CRITICAL | `nc -e`, `bash -i`, `/dev/tcp/` |
+| `destructive_commands` | CRITICAL | `rm -rf /`, `mkfs`, `format c:` |
+| `privilege_escalation` | HIGH | `sudo`, `chmod 777`, `chmod +s` |
+| `code_execution` | HIGH | `eval()`, `new Function()`, `child_process` |
+| `obfuscation_techniques` | HIGH | `atob()`, `\x72\x6d`, `String.fromCharCode` |
+| `browser_data_theft` | HIGH | `document.cookie`, `localStorage`, `Chrome/Login Data` |
+
+See [Detection Rules](./docs/DETECTION_RULES.md) for full pattern details.
+
 ## Pricing
 
 Pay-per-audit with USDC on Base mainnet. No accounts, no subscriptions.
@@ -90,6 +143,59 @@ Pay-per-audit with USDC on Base mainnet. No accounts, no subscriptions.
 | Quick | $0.05 | YARA malware scan |
 | Standard | $0.15 | + Permission analysis + Network detection |
 | Deep | $0.50 | + Behavioral sandbox + Signed attestation |
+
+## x402 Payment Flow
+
+x402guard uses the [x402 protocol](https://x402.org) for pay-per-audit. No accounts needed.
+
+```
+┌──────────┐         ┌──────────────┐         ┌─────────────┐
+│  Client  │         │  x402guard   │         │ Facilitator │
+└────┬─────┘         └──────┬───────┘         └──────┬──────┘
+     │                      │                        │
+     │ POST /audit/quick    │                        │
+     │ (no payment)         │                        │
+     │─────────────────────>│                        │
+     │                      │                        │
+     │ 402 Payment Required │                        │
+     │ PAYMENT-REQUIRED:    │                        │
+     │ {amount, asset, payTo}                        │
+     │<─────────────────────│                        │
+     │                      │                        │
+     │ Sign payment tx      │                        │
+     │ with wallet          │                        │
+     │                      │                        │
+     │ POST /audit/quick    │                        │
+     │ X-PAYMENT: <signed>  │                        │
+     │─────────────────────>│                        │
+     │                      │  Verify + settle       │
+     │                      │─────────────────────-->│
+     │                      │                        │
+     │                      │  USDC transferred      │
+     │                      │<─────────────────────  │
+     │                      │                        │
+     │ 200 OK               │                        │
+     │ {risk_score, findings}                        │
+     │<─────────────────────│                        │
+```
+
+The `PAYMENT-REQUIRED` header (base64-encoded) contains:
+```json
+{
+  "x402Version": 2,
+  "accepts": [{
+    "scheme": "exact",
+    "network": "eip155:8453",
+    "amount": "50000",
+    "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    "payTo": "0x..."
+  }]
+}
+```
+
+- **Network**: Base Mainnet (CAIP-2: `eip155:8453`)
+- **Asset**: USDC (`0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`)
+- **Amount**: In atomic units (6 decimals) — `50000` = $0.05
 
 ## Documentation
 

@@ -17,11 +17,12 @@ export function createServer(): Express {
     next();
   });
   
-  // CORS
+  // CORS - x402 requires exposing payment response headers
   app.use((req: any, res: any, next: any) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Payment");
     res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.header("Access-Control-Expose-Headers", "X-Payment-Response, X-Payment-Required");
     if (req.method === "OPTIONS") {
       res.sendStatus(200);
       return;

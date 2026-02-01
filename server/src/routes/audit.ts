@@ -27,7 +27,7 @@ async function fetchSkillContent(url: string): Promise<string> {
   }
 
   const fetchResult: any = await fetch(url, {
-    headers: { "User-Agent": "SkillGuard/0.1" },
+    headers: { "User-Agent": "x402guard/0.1" },
   });
 
   if (!fetchResult.ok) {
@@ -101,7 +101,7 @@ router.use(createX402Middleware());
 // GET /audit - Return pricing info (free)
 router.get("/audit", (_req: any, res: any) => {
   res.json({
-    message: "SkillGuard Audit API",
+    message: "x402guard Audit API",
     method: "POST",
     pricing: getPricingInfo(),
     payment: "x402 - Include X-Payment header with payment proof",

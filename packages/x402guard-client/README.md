@@ -5,7 +5,7 @@ Client SDK for x402guard - x402-powered security auditing for AI agent skills.
 ## Installation
 
 ```bash
-npm install x402guard-client @x402/core @x402/evm
+npm install x402guard-client @x402/core @x402/evm viem
 ```
 
 ## Quick Start
@@ -90,4 +90,4 @@ Please update to use `X402GuardClient` instead.
 
 ## License
 
-MIT
+PROPRIETARY - See LICENSE file in root directory.

@@ -2,6 +2,7 @@ import express from 'express';
 import { paymentMiddleware } from "@x402/express";
 import { x402ResourceServer, HTTPFacilitatorClient } from "@x402/core/server";
 import { registerExactEvmScheme } from "@x402/evm/exact/server";
+import { createFacilitatorConfig } from "@coinbase/x402";
 import { scanWithYara } from "../src/services/auditEngine/yaraScanner.js";
 import { analyzePermissions } from "../src/services/auditEngine/permissionAnalyzer.js";
 import { detectNetworkCalls } from "../src/services/auditEngine/networkDetector.js";
@@ -10,12 +11,12 @@ import { calculateRisk } from "../src/services/auditEngine/riskCalculator.js";
 const app = express();
 app.use(express.json({ limit: '2mb' }));
 
-// CORS
+// CORS - x402 requires exposing payment response headers
 app.use((req: any, res: any, next: any) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Payment");
   res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.header("Access-Control-Expose-Headers", "X-Payment-Response");
+  res.header("Access-Control-Expose-Headers", "X-Payment-Response, X-Payment-Required");
   if (req.method === "OPTIONS") {
     res.sendStatus(200);
     return;
@@ -25,16 +26,23 @@ app.use((req: any, res: any, next: any) => {
 
 // Config - MAINNET DEFAULTS
 const PAY_TO = process.env.X402_PAY_TO_ADDRESS || "0xdc7f6ebefe62a402e7c75dd0b6d20ed7c4cb326a";
-const FACILITATOR_URL = process.env.X402_FACILITATOR_URL || "https://api.cdp.coinbase.com/platform/v2/x402";
 const NETWORK = "eip155:8453"; // Base Mainnet - ALWAYS mainnet
+const CDP_API_KEY_ID = process.env.CDP_API_KEY_ID;
+const CDP_API_KEY_SECRET = process.env.CDP_API_KEY_SECRET;
 
-// Create facilitator client and server
-const facilitatorClient = new HTTPFacilitatorClient({
-  url: FACILITATOR_URL
-});
+// Create facilitator config with CDP credentials (if available)
+// Per x402 V2 standard, use createFacilitatorConfig for authenticated requests
+let facilitatorClient: HTTPFacilitatorClient;
+if (CDP_API_KEY_ID && CDP_API_KEY_SECRET) {
+  const facilitatorConfig = createFacilitatorConfig(CDP_API_KEY_ID, CDP_API_KEY_SECRET);
+  facilitatorClient = new HTTPFacilitatorClient(facilitatorConfig);
+} else {
+  // Fallback to unauthenticated (may have rate limits)
+  facilitatorClient = new HTTPFacilitatorClient();
+}
 
-const server = new x402ResourceServer(facilitatorClient);
-registerExactEvmScheme(server);
+const x402Server = new x402ResourceServer(facilitatorClient);
+registerExactEvmScheme(x402Server);
 
 // x402 Payment Middleware for tier endpoints
 app.use(
@@ -77,7 +85,7 @@ app.use(
         mimeType: "application/json",
       },
     },
-    server,
+    x402Server,
   ),
 );
 
@@ -132,7 +140,7 @@ app.get('/pricing', (_req: any, res: any) => {
 // Root info (free)
 app.get('/', (_req: any, res: any) => {
   res.json({
-    name: 'SkillGuard API',
+    name: 'x402guard API',
     version: '0.1.0',
     description: 'x402-powered security auditing for AI agent skills',
     endpoints: {
@@ -202,7 +210,7 @@ async function fetchSkillContent(url: string): Promise<string> {
     throw new Error("Only HTTPS URLs are allowed");
   }
   const response: any = await fetch(url, {
-    headers: { "User-Agent": "SkillGuard/0.1" },
+    headers: { "User-Agent": "x402guard/0.1" },
   });
   if (!response.ok) {
     throw new Error(`Failed to fetch skill: ${response.status}`);

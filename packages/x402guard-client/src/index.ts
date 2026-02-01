@@ -151,7 +151,7 @@ export class X402GuardClient {
     if (!response.ok) {
       throw new Error(`Health check failed: ${response.status}`);
     }
-    return response.json();
+    return response.json() as Promise<HealthResponse>;
   }
 
   /**
@@ -192,7 +192,7 @@ export class X402GuardClient {
       throw new Error(`Audit failed (${response.status}): ${error}`);
     }
 
-    return response.json();
+    return response.json() as Promise<AuditResult>;
   }
 
   /**

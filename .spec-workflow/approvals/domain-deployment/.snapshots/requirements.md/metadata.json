@@ -1,0 +1,22 @@
+{
+  "filePath": ".spec-workflow/specs/domain-deployment/requirements.md",
+  "currentVersion": 2,
+  "snapshots": [
+    {
+      "version": 1,
+      "filename": "snapshot-001.json",
+      "timestamp": "2026-02-01T03:15:27.003Z",
+      "trigger": "initial",
+      "approvalId": "approval_1769915727001_30144h4uk",
+      "approvalTitle": "Domain Deployment Requirements for x402guard.xyz"
+    },
+    {
+      "version": 2,
+      "filename": "snapshot-002.json",
+      "timestamp": "2026-02-01T03:16:14.742Z",
+      "trigger": "approved",
+      "approvalId": "approval_1769915727001_30144h4uk",
+      "approvalTitle": "Domain Deployment Requirements for x402guard.xyz"
+    }
+  ]
+}
