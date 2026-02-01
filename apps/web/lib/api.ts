@@ -16,8 +16,10 @@ export async function runAudit(
   body: { skill_url?: string; skill_content?: string },
   fetchFn: typeof fetch = fetch
 ): Promise<AuditResponse> {
+  const url = `${API_URL}/api/audit/${tier}`;
+
   try {
-    const response = await fetchFn(`${API_URL}/api/audit/${tier}`, {
+    const response = await fetchFn(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),

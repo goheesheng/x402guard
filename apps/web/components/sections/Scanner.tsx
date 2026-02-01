@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import {
+  Search,
   CheckCircle,
   Loader2,
   AlertCircle,
@@ -11,14 +12,25 @@ import {
   CreditCard,
 } from "lucide-react";
 import { useAccount } from "wagmi";
-import { Card, Button, Input, Textarea, Badge, WalletConnect } from "@/components/ui";
+import { Card, Button, Input, Textarea, Badge, VulnerabilityDisplay } from "@/components/ui";
+import { WalletConnect } from "@/components/ui/WalletConnect";
 import { TIERS } from "@/lib/constants";
 import { runAudit, getRiskColor, getRiskLevelColor, getRecommendationColor } from "@/lib/api";
 import { useX402Payment } from "@/lib/hooks/useX402Payment";
 import { fadeInUp, stagger } from "@/lib/animations";
-import type { AuditTier, AuditResult } from "@x402guard/shared-types";
+import type { AuditTier, AuditResult } from "@/types";
 
-type ScanState = "idle" | "awaiting_signature" | "processing" | "success" | "error";
+interface PaymentInfo {
+  transactionHash: string;
+  paidAmount: string;
+}
+
+type ScanState =
+  | "idle"
+  | "awaiting_signature"
+  | "processing"
+  | "success"
+  | "error";
 
 export function Scanner() {
   const [skillUrl, setSkillUrl] = useState("https://clawdhub.com/skills/weather");
@@ -27,6 +39,7 @@ export function Scanner() {
   const [scanState, setScanState] = useState<ScanState>("idle");
   const [result, setResult] = useState<AuditResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null);
 
   const { isConnected } = useAccount();
   const { fetchWithPayment, isReady } = useX402Payment();
@@ -47,6 +60,7 @@ export function Scanner() {
     setResult(null);
 
     try {
+      // Use x402 wrapped fetch for payment
       setScanState("processing");
 
       const response = await runAudit(
@@ -61,10 +75,19 @@ export function Scanner() {
       if (response.success && response.data) {
         setResult(response.data);
         setScanState("success");
+
+        // Store payment info if available
+        if (response.paymentDetails?.transactionHash) {
+          setPaymentInfo({
+            transactionHash: response.paymentDetails.transactionHash,
+            paidAmount: selectedTierData.price,
+          });
+        }
       } else if (response.error) {
         setError(response.error);
         setScanState("error");
       } else if (response.paymentRequired) {
+        // This shouldn't happen with x402 fetch, but handle it
         setError("Payment failed. Please ensure you have sufficient USDC on Base.");
         setScanState("error");
       }
@@ -270,6 +293,7 @@ export function Scanner() {
               {getButtonContent()}
             </Button>
 
+            {/* Payment Flow Info */}
             {isConnected && scanState === "idle" && (
               <p className="text-center text-dark-500 text-sm mt-4">
                 Clicking will prompt your wallet to sign a USDC payment on Base
@@ -364,37 +388,14 @@ export function Scanner() {
                     </div>
                   </div>
 
-                  {/* Findings Summary */}
+                  {/* Vulnerability Display */}
                   {result.findings && (
-                    <div className="p-4 bg-dark-800 border border-dark-700 rounded-xl">
-                      <h4 className="text-white font-semibold mb-3">Findings Summary</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div>
-                          <p className="text-dark-400 text-sm">Malware</p>
-                          <p className="text-xl font-bold text-white">
-                            {result.findings.malware?.length || 0}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-dark-400 text-sm">Credentials</p>
-                          <p className="text-xl font-bold text-white">
-                            {result.findings.credentials?.length || 0}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-dark-400 text-sm">Network</p>
-                          <p className="text-xl font-bold text-white">
-                            {result.findings.network?.length || 0}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-dark-400 text-sm">Permissions</p>
-                          <p className="text-xl font-bold text-white">
-                            {result.findings.permissions?.length || 0}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+                    <VulnerabilityDisplay
+                      findings={result.findings}
+                      riskLevel={result.risk_level}
+                      transactionHash={paymentInfo?.transactionHash}
+                      paidAmount={paymentInfo?.paidAmount}
+                    />
                   )}
 
                   {/* Attestation */}

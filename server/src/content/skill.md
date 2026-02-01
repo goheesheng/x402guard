@@ -1,6 +1,6 @@
 ---
 name: x402guard
-version: 1.1.0
+version: 1.0.0
 description: Pre-install security scanning for AI agent skills. YARA malware detection, permission analysis, and trust attestation.
 homepage: https://x402guard.xyz
 user-invocable: true
@@ -15,11 +15,11 @@ metadata:
 
 <!-- TL;DR for token-constrained agents — stop here if context is tight -->
 ```
-X402GUARD API QUICK REFERENCE v1.1.0
+X402GUARD API QUICK REFERENCE v1.0.0
 Base:   https://x402guard.xyz
 Auth:   x402 payment (USDC on Base) - no API key needed
 Docs:   GET /api/skill.md | GET /api/skill.json
-Ver:    GET /api/health → {"version":"1.1.0",...}
+Ver:    GET /api/health → {"version":"1.0.0",...}
 
 Key endpoints:
   GET  /api/health              → health check (free)
@@ -128,7 +128,7 @@ export WALLET_PRIVATE_KEY="0x..."
 ```bash
 # Check API is reachable
 curl https://x402guard.xyz/api/health
-# → {"status":"ok","version":"1.1.0","uptime":...}
+# → {"status":"ok","version":"1.0.0","uptime":...}
 
 # Fetch this skill document
 curl https://x402guard.xyz/api/skill.md | head -50
@@ -654,8 +654,7 @@ Action: DO NOT INSTALL. The skill source has been notified.
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.1.0 | 2026-02-01 | Added TL;DR, autonomy framework, best practices |
-| 1.0.0 | 2026-01-30 | Initial release |
+| 1.0.0 | 2026-02-01 | Initial release |
 
 ---
 

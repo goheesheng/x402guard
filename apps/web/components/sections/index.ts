@@ -1,2 +1,9 @@
+export { Navigation } from "./Navigation";
 export { HeroToggle } from "./HeroToggle";
+export { Problem } from "./Problem";
+export { AgentSkills } from "./AgentSkills";
+export { Solution } from "./Solution";
 export { Scanner } from "./Scanner";
+export { Integration } from "./Integration";
+export { FAQ } from "./FAQ";
+export { Footer } from "./Footer";

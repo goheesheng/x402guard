@@ -101,7 +101,7 @@ Free endpoint to check API status.
 ```json
 {
   "status": "ok",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "uptime": 3600
 }
 ```
@@ -158,7 +158,7 @@ Returns API information and pricing.
 ```json
 {
   "name": "x402guard API",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "x402-powered security auditing for AI agent skills",
   "endpoints": {
     "free": ["/api/health", "/api/pricing"],

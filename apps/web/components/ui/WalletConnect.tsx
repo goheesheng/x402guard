@@ -18,6 +18,7 @@ export function WalletConnect({
   showBalance = false,
   size = "md",
 }: WalletConnectProps) {
+  // All hooks must be called unconditionally at the top
   const { address, isConnected, isConnecting } = useAccount();
   const { connect, connectors, isPending } = useConnect();
   const { disconnect } = useDisconnect();

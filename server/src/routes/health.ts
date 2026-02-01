@@ -8,7 +8,7 @@ const startTime = Date.now();
 router.get("/health", (_req: any, res: any) => {
   const response: HealthResponse = {
     status: "ok",
-    version: "1.1.0",
+    version: "1.0.0",
     uptime: Math.floor((Date.now() - startTime) / 1000),
   };
   

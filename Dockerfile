@@ -44,7 +44,12 @@ RUN pnpm --filter x402guard-client build || true
 # Build server
 RUN cd server && pnpm build
 
-# Build Next.js web app
+# Build Next.js web app with production API URL
+# NEXT_PUBLIC_* vars must be set at build time for Next.js
+ARG NEXT_PUBLIC_API_URL=https://x402guard.xyz
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+# Ensure public folder exists (Next.js requires it)
+RUN mkdir -p apps/web/public
 RUN cd apps/web && pnpm build
 
 # =============================================================================

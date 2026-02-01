@@ -255,6 +255,7 @@ metadata:
 - [SDK Reference](./docs/SDK_REFERENCE.md) — X402GuardClient API
 - [Agent Integration](./docs/AGENT_INTEGRATION.md) — OpenClaw, LangChain, etc.
 - [Deployment](./docs/DEPLOYMENT.md) — Deploy to production
+- [AWS Deployment](./docs/AWS_DEPLOYMENT.md) — Deploy to AWS EC2
 
 **Reference**
 - [API Reference](./docs/API_REFERENCE.md) — HTTP API documentation
@@ -262,23 +263,23 @@ metadata:
 - [Risk Scoring](./docs/RISK_SCORING.md) — How scores work
 - [Self-Hosting](./docs/SELF_HOSTING.md) — Run your own server
 
-## Web UI (Coming Soon)
+## Web UI
 
-x402guard will include a modern web interface for scanning skills without writing code:
+x402guard includes a modern web interface for scanning skills without writing code:
 
 - **Human/Agent Toggle** - Tailored onboarding for both audiences
 - **Interactive Scanner** - Paste URL or skill content, select tier, scan
 - **Visual Results** - Risk score gauge, findings breakdown, recommendations
-- **Wallet Integration** - Connect MetaMask, pay with USDC on Base
+- **Wallet Integration** - Connect wallet, pay with USDC on Base
 
-The web UI will be available at `https://x402guard.xyz` once deployed.
+The web UI is available at `https://x402guard.xyz`.
 
 ## Project Structure
 
 ```
 skillguard-monorepo/
 ├── apps/
-│   └── web/               # Next.js web UI (coming soon)
+│   └── web/               # Next.js web UI
 ├── server/                # Express API server
 │   └── src/
 │       ├── services/      # Audit engine, YARA scanner
@@ -288,7 +289,9 @@ skillguard-monorepo/
 │   ├── x402guard-client/  # TypeScript SDK
 │   └── shared-types/      # Shared TypeScript types
 ├── examples/              # Usage examples
-└── docs/                  # Documentation
+├── docs/                  # Documentation
+├── Dockerfile             # Unified Docker deployment
+└── ecosystem.config.js    # PM2 process manager config
 ```
 
 ## Development
@@ -297,12 +300,26 @@ skillguard-monorepo/
 # Install dependencies
 pnpm install
 
-# Start server (runs on localhost:3000)
-pnpm dev:server
+# Start development server (web on :3000, API on :3001)
+pnpm dev
 
-# Build
+# Build for production
 pnpm build
+
+# Start production server
+pnpm start
 ```
+
+### Environment Configuration
+
+Create `apps/web/.env` for local development:
+
+```bash
+# For local development - API runs on port 3001
+NEXT_PUBLIC_API_URL=http://localhost:3001
+```
+
+For production, the default is `https://x402guard.xyz` (no env needed).
 
 ## API Endpoints
 

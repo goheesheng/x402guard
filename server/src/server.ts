@@ -18,12 +18,37 @@ export function createServer(): Express {
     next();
   });
   
-  // CORS - x402 requires exposing payment response headers
+  /**
+   * CORS Configuration for x402 Payment Protocol
+   *
+   * IMPORTANT: The x402 payment flow requires specific CORS headers:
+   *
+   * 1. Access-Control-Allow-Headers MUST include:
+   *    - PAYMENT-SIGNATURE: The signed payment proof sent by the client
+   *    - X-PAYMENT: Alternative payment header (v1 compatibility)
+   *    - Access-Control-Expose-Headers: The x402 client sets this on retry requests
+   *
+   * 2. Access-Control-Expose-Headers MUST include:
+   *    - PAYMENT-REQUIRED: Server sends this with 402 response (base64 encoded payment requirements)
+   *    - PAYMENT-RESPONSE: Server sends this after successful payment verification
+   *
+   * Common issues fixed:
+   * - "Failed to parse payment requirements: Invalid payment required response"
+   *   → PAYMENT-REQUIRED header not exposed to browser (missing from Expose-Headers)
+   *
+   * - "Request header field access-control-expose-headers is not allowed"
+   *   → x402 client sends Access-Control-Expose-Headers on retry, must be in Allow-Headers
+   *
+   * - "Failed to fetch" with 402 status
+   *   → CORS blocking the response headers, check both Allow-Headers and Expose-Headers
+   */
   app.use((req: any, res: any, next: any) => {
     res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Payment");
+    // Allow all x402 payment headers (the client sends Access-Control-Expose-Headers on retry)
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Payment, PAYMENT-SIGNATURE, X-PAYMENT, Access-Control-Expose-Headers");
     res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    res.header("Access-Control-Expose-Headers", "X-Payment-Response, X-Payment-Required");
+    // Expose all x402 payment headers (both v1 and v2 formats)
+    res.header("Access-Control-Expose-Headers", "PAYMENT-REQUIRED, PAYMENT-RESPONSE, X-Payment-Response, X-Payment-Required");
     if (req.method === "OPTIONS") {
       res.sendStatus(200);
       return;
