@@ -11,7 +11,8 @@ import {
   PenLine,
   CreditCard,
 } from "lucide-react";
-import { useAccount } from "wagmi";
+import { useAccount, useChainId, useSwitchChain } from "wagmi";
+import { base } from "wagmi/chains";
 import { Card, Button, Input, Textarea, Badge, VulnerabilityDisplay } from "@/components/ui";
 import { WalletConnect } from "@/components/ui/WalletConnect";
 import { TIERS } from "@/lib/constants";
@@ -42,12 +43,28 @@ export function Scanner() {
   const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null);
 
   const { isConnected } = useAccount();
+  const chainId = useChainId();
+  const { switchChain } = useSwitchChain();
   const { fetchWithPayment, isReady } = useX402Payment();
+
+  const isWrongNetwork = isConnected && chainId !== base.id;
 
   const handleScan = async () => {
     if (!isConnected) {
       setError("Please connect your wallet first");
       return;
+    }
+
+    // Check if on wrong network and switch
+    if (isWrongNetwork) {
+      try {
+        await switchChain({ chainId: base.id });
+        // Wait a bit for the switch to complete
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      } catch (err: any) {
+        setError("Please switch to Base network in your wallet");
+        return;
+      }
     }
 
     if (!fetchWithPayment) {
@@ -166,6 +183,37 @@ export function Scanner() {
             sign the payment, and get instant security results.
           </motion.p>
         </motion.div>
+
+        {/* Wrong Network Warning */}
+        {isWrongNetwork && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8"
+          >
+            <Card className="p-6 border-yellow-500/30 bg-yellow-500/5">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center">
+                    <AlertCircle className="w-6 h-6 text-yellow-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-white">Wrong Network</h3>
+                    <p className="text-dark-400 text-sm">
+                      Please switch to Base network to make payments
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="secondary"
+                  onClick={() => switchChain({ chainId: base.id })}
+                >
+                  Switch to Base
+                </Button>
+              </div>
+            </Card>
+          </motion.div>
+        )}
 
         {/* Wallet Connection Banner */}
         {!isConnected && (
