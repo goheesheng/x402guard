@@ -71,7 +71,7 @@ async function main() {
   // Test 1: Health check (free)
   console.log("\n2. Testing health endpoint (free)...");
   try {
-    const healthRes = await fetch(`${API_URL}/health`);
+    const healthRes = await fetch(`${API_URL}/api/health`);
     const health = await healthRes.json();
     console.log(`   Status: ${health.status}`);
     console.log(`   Version: ${health.version}`);
@@ -85,7 +85,7 @@ async function main() {
   console.log("\n3. Testing quick audit with payment (clean skill)...");
   console.log("   Price: $0.05 USDC");
   try {
-    const auditRes = await fetchWithPayment(`${API_URL}/audit/quick`, {
+    const auditRes = await fetchWithPayment(`${API_URL}/api/audit/quick`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ skill_content: CLEAN_SKILL }),
@@ -117,7 +117,7 @@ async function main() {
   console.log("\n4. Testing standard audit with payment (malicious skill)...");
   console.log("   Price: $0.05 USDC");
   try {
-    const auditRes = await fetchWithPayment(`${API_URL}/audit/standard`, {
+    const auditRes = await fetchWithPayment(`${API_URL}/api/audit/standard`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ skill_content: MALICIOUS_SKILL }),

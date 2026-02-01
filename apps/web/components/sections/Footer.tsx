@@ -23,10 +23,11 @@ export function Footer() {
             </p>
             <div className="flex items-center gap-4">
               <a
-                href="https://twitter.com/x402guard"
+                href="https://x.com/goheesheng"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-dark-400 hover:text-white transition-colors"
+                title="X (Twitter)"
               >
                 <Twitter className="w-6 h-6" />
               </a>
@@ -85,14 +86,6 @@ export function Footer() {
                 >
                   x402 Protocol
                   <ExternalLink className="w-3 h-3" />
-                </a>
-              </li>
-              <li>
-                <a
-                  href="mailto:support@x402guard.dev"
-                  className="text-dark-400 hover:text-white transition-colors inline-flex items-center gap-1"
-                >
-                  Contact Support
                 </a>
               </li>
             </ul>
