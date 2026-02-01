@@ -77,7 +77,7 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     question: "Do you offer enterprise solutions?",
     answer:
-      "Yes! We offer custom integration, volume pricing, and dedicated support for enterprise customers. Contact us at enterprise@x402guard.dev for more information.",
+      "Yes! We offer custom integration, volume pricing, and dedicated support for enterprise customers. DM @goheesheng on X, founder of x402guard, for more information.",
   },
   {
     question: "What risks does x402guard detect?",

@@ -191,9 +191,9 @@ export function Integration() {
             {
               title: "Enterprise Solutions",
               description:
-                "Need custom integration or volume pricing? Contact us for enterprise options.",
-              link: "mailto:enterprise@x402guard.dev",
-              linkText: "Contact Sales",
+                "Need custom integration or volume pricing? DM @goheesheng on X, founder of x402guard.",
+              link: "https://x.com/goheesheng",
+              linkText: "DM on X",
             },
           ].map((item, i) => (
             <motion.div key={i} variants={fadeInUp}>
