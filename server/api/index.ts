@@ -64,7 +64,7 @@ app.use(
         accepts: [
           {
             scheme: "exact",
-            price: "$0.15",
+            price: "$0.05",
             network: NETWORK,
             payTo: PAY_TO,
           },
@@ -76,7 +76,7 @@ app.use(
         accepts: [
           {
             scheme: "exact",
-            price: "$0.50",
+            price: "$0.10",
             network: NETWORK,
             payTo: PAY_TO,
           },
@@ -100,8 +100,8 @@ app.get('/api/pricing', (_req: any, res: any) => {
     tiers: [
       {
         name: "quick",
-        price: "50000",
-        priceUSD: 0.05,
+        price: "10000",
+        priceUSD: 0.01,
         features: [
           "YARA malware scanning",
           "Basic risk score (0-100)",
@@ -111,8 +111,8 @@ app.get('/api/pricing', (_req: any, res: any) => {
       },
       {
         name: "standard",
-        price: "150000",
-        priceUSD: 0.15,
+        price: "50000",
+        priceUSD: 0.05,
         features: [
           "All Quick features",
           "Permission analysis",
@@ -122,8 +122,8 @@ app.get('/api/pricing', (_req: any, res: any) => {
       },
       {
         name: "deep",
-        price: "500000",
-        priceUSD: 0.50,
+        price: "100000",
+        priceUSD: 0.10,
         features: [
           "All Standard features",
           "Behavioral sandbox",
@@ -146,9 +146,9 @@ app.get('/', (_req: any, res: any) => {
     endpoints: {
       free: ['/api/health', '/api/pricing', '/api/skill.md', '/api/skill.json'],
       paid: {
-        '/api/audit/quick': { price: '$0.05', description: 'YARA malware scan' },
-        '/api/audit/standard': { price: '$0.15', description: 'Full analysis + permissions + network' },
-        '/api/audit/deep': { price: '$0.50', description: 'Complete audit + behavioral sandbox' },
+        '/api/audit/quick': { price: '$0.01', description: 'YARA malware scan' },
+        '/api/audit/standard': { price: '$0.05', description: 'Full analysis + permissions + network' },
+        '/api/audit/deep': { price: '$0.10', description: 'Complete audit + behavioral sandbox' },
       }
     },
     payment: {
@@ -186,9 +186,9 @@ Key endpoints:
   GET  /api/health              → health check (free)
   GET  /api/skill.md            → this document (free)
   GET  /api/skill.json          → structured metadata (free)
-  POST /api/audit/quick         → $0.05 YARA malware scan
-  POST /api/audit/standard      → $0.15 + permissions + network analysis
-  POST /api/audit/deep          → $0.50 + behavioral sandbox + attestation
+  POST /api/audit/quick         → $0.01 YARA malware scan
+  POST /api/audit/standard      → $0.05 + permissions + network analysis
+  POST /api/audit/deep          → $0.10 + behavioral sandbox + attestation
 
 Request body: {"skill_url": "https://..."} OR {"skill_content": "---\\nname:..."}
 Response: {"risk_score": 0-100, "risk_level": "LOW|MEDIUM|HIGH|CRITICAL",
@@ -265,9 +265,9 @@ curl -i -X POST https://x402guard.xyz/api/audit/quick \\
 | GET | \`/api/health\` | Free | Health check, version info |
 | GET | \`/api/skill.md\` | Free | This document (markdown) |
 | GET | \`/api/skill.json\` | Free | Structured metadata (JSON) |
-| POST | \`/api/audit/quick\` | $0.05 | YARA malware scan |
-| POST | \`/api/audit/standard\` | $0.15 | + Permission & network analysis |
-| POST | \`/api/audit/deep\` | $0.50 | + Behavioral sandbox & attestation |
+| POST | \`/api/audit/quick\` | $0.01 | YARA malware scan |
+| POST | \`/api/audit/standard\` | $0.05 | + Permission & network analysis |
+| POST | \`/api/audit/deep\` | $0.10 | + Behavioral sandbox & attestation |
 
 ### Request Format
 \`\`\`json
@@ -332,9 +332,9 @@ const SKILL_METADATA = {
     },
   },
   endpoints: {
-    audit_quick: { method: "POST", path: "/api/audit/quick", description: "Quick YARA malware scan ($0.05 USDC)", price_usdc: "0.05", requires_payment: true },
-    audit_standard: { method: "POST", path: "/api/audit/standard", description: "Standard scan with permissions + network analysis ($0.15 USDC)", price_usdc: "0.15", requires_payment: true },
-    audit_deep: { method: "POST", path: "/api/audit/deep", description: "Deep scan with behavioral sandbox + attestation ($0.50 USDC)", price_usdc: "0.50", requires_payment: true },
+    audit_quick: { method: "POST", path: "/api/audit/quick", description: "Quick YARA malware scan ($0.01 USDC)", price_usdc: "0.01", requires_payment: true },
+    audit_standard: { method: "POST", path: "/api/audit/standard", description: "Standard scan with permissions + network analysis ($0.05 USDC)", price_usdc: "0.05", requires_payment: true },
+    audit_deep: { method: "POST", path: "/api/audit/deep", description: "Deep scan with behavioral sandbox + attestation ($0.10 USDC)", price_usdc: "0.10", requires_payment: true },
     health: { method: "GET", path: "/api/health", description: "Health check endpoint", requires_payment: false },
     skill_md: { method: "GET", path: "/api/skill.md", description: "This skill document (markdown)", requires_payment: false },
     skill_json: { method: "GET", path: "/api/skill.json", description: "Skill metadata (JSON)", requires_payment: false },
@@ -344,7 +344,7 @@ const SKILL_METADATA = {
     asset: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
     asset_name: "USDC",
     decimals: 6,
-    tiers: { quick: "0.05", standard: "0.15", deep: "0.50" },
+    tiers: { quick: "0.01", standard: "0.05", deep: "0.10" },
   },
   documentation: {
     homepage: "https://x402guard.xyz",
@@ -458,7 +458,7 @@ app.post('/api/audit/quick', async (req: any, res: any) => {
   }
 });
 
-// Standard audit endpoint ($0.15)
+// Standard audit endpoint ($0.05)
 app.post('/api/audit/standard', async (req: any, res: any) => {
   try {
     const { skill_url, skill_content } = req.body;
@@ -479,7 +479,7 @@ app.post('/api/audit/standard', async (req: any, res: any) => {
   }
 });
 
-// Deep audit endpoint ($0.50)
+// Deep audit endpoint ($0.10)
 app.post('/api/audit/deep', async (req: any, res: any) => {
   try {
     const { skill_url, skill_content } = req.body;

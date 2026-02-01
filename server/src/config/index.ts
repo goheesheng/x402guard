@@ -21,9 +21,10 @@ const envSchema = z.object({
   CDP_API_KEY_SECRET: z.string().optional(),
 
   // Pricing (USDC atomic units, 6 decimals)
-  PRICE_QUICK: z.string().default("50000").transform(Number),
-  PRICE_STANDARD: z.string().default("150000").transform(Number),
-  PRICE_DEEP: z.string().default("500000").transform(Number),
+  // $0.01 = 10000, $0.05 = 50000, $0.10 = 100000
+  PRICE_QUICK: z.string().default("10000").transform(Number),
+  PRICE_STANDARD: z.string().default("50000").transform(Number),
+  PRICE_DEEP: z.string().default("100000").transform(Number),
 
   // Limits
   MAX_SKILL_SIZE: z.string().default("1048576").transform(Number),

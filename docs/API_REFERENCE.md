@@ -68,8 +68,8 @@ Free endpoint returning structured skill metadata as JSON.
     "audit_quick": {
       "method": "POST",
       "path": "/api/audit/quick",
-      "description": "Quick YARA malware scan ($0.05 USDC)",
-      "price_usdc": "0.05",
+      "description": "Quick YARA malware scan ($0.01 USDC)",
+      "price_usdc": "0.01",
       "requires_payment": true
     }
   },
@@ -79,9 +79,9 @@ Free endpoint returning structured skill metadata as JSON.
     "asset_name": "USDC",
     "decimals": 6,
     "tiers": {
-      "quick": "0.05",
-      "standard": "0.15",
-      "deep": "0.50"
+      "quick": "0.01",
+      "standard": "0.05",
+      "deep": "0.10"
     }
   }
 }
@@ -122,20 +122,20 @@ Free endpoint returning current pricing.
   "tiers": [
     {
       "name": "quick",
-      "price": "50000",
-      "priceUSD": 0.05,
+      "price": "10000",
+      "priceUSD": 0.01,
       "features": ["YARA malware scanning", "Risk score", "Recommendation"]
     },
     {
       "name": "standard",
-      "price": "150000",
-      "priceUSD": 0.15,
+      "price": "50000",
+      "priceUSD": 0.05,
       "features": ["All Quick features", "Permission analysis", "Network call detection"]
     },
     {
       "name": "deep",
-      "price": "500000",
-      "priceUSD": 0.50,
+      "price": "100000",
+      "priceUSD": 0.10,
       "features": ["All Standard features", "Behavioral sandbox", "Signed attestation"]
     }
   ],
@@ -163,9 +163,9 @@ Returns API information and pricing.
   "endpoints": {
     "free": ["/api/health", "/api/pricing"],
     "paid": {
-      "/api/audit/quick": { "price": "$0.05", "description": "YARA malware scan" },
-      "/api/audit/standard": { "price": "$0.15", "description": "Full analysis + permissions + network" },
-      "/api/audit/deep": { "price": "$0.50", "description": "Complete audit + behavioral sandbox" }
+      "/api/audit/quick": { "price": "$0.01", "description": "YARA malware scan" },
+      "/api/audit/standard": { "price": "$0.05", "description": "Full analysis + permissions + network" },
+      "/api/audit/deep": { "price": "$0.10", "description": "Complete audit + behavioral sandbox" }
     }
   },
   "payment": {
@@ -184,7 +184,7 @@ Returns API information and pricing.
 POST /api/audit/quick
 ```
 
-**Price:** $0.05 USDC
+**Price:** $0.01 USDC
 
 Fast YARA-based malware scan.
 
@@ -224,7 +224,7 @@ Fast YARA-based malware scan.
 POST /api/audit/standard
 ```
 
-**Price:** $0.15 USDC
+**Price:** $0.05 USDC
 
 Full analysis including permissions and network calls.
 
@@ -238,7 +238,7 @@ Same request/response format as Quick Audit, with more detailed findings.
 POST /api/audit/deep
 ```
 
-**Price:** $0.50 USDC
+**Price:** $0.10 USDC
 
 Complete audit with behavioral sandbox analysis and signed attestation.
 
@@ -299,7 +299,7 @@ Complete audit with behavioral sandbox analysis and signed attestation.
     {
       "scheme": "exact",
       "network": "eip155:8453",
-      "maxAmountRequired": "150000",
+      "maxAmountRequired": "50000",
       "payTo": "0x...",
       "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
     }

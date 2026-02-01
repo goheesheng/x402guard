@@ -106,24 +106,24 @@ router.get("/audit", (_req: any, res: any) => {
     pricing: getPricingInfo(),
     payment: "x402 - Include X-Payment header with payment proof",
     endpoints: {
-      "/audit/quick": "$0.05 - YARA malware scan",
-      "/audit/standard": "$0.15 - Full analysis + permissions + network",
-      "/audit/deep": "$0.50 - Complete audit + behavioral sandbox",
+      "/audit/quick": "$0.01 - YARA malware scan",
+      "/audit/standard": "$0.05 - Full analysis + permissions + network",
+      "/audit/deep": "$0.10 - Complete audit + behavioral sandbox",
     },
   });
 });
 
-// POST /audit/quick - Quick audit ($0.05)
+// POST /audit/quick - Quick audit ($0.01)
 router.post("/audit/quick", (req: any, res: any, next: any) => {
   runAuditHandler(req, res, next, "quick");
 });
 
-// POST /audit/standard - Standard audit ($0.15)
+// POST /audit/standard - Standard audit ($0.05)
 router.post("/audit/standard", (req: any, res: any, next: any) => {
   runAuditHandler(req, res, next, "standard");
 });
 
-// POST /audit/deep - Deep audit ($0.50)
+// POST /audit/deep - Deep audit ($0.10)
 router.post("/audit/deep", (req: any, res: any, next: any) => {
   runAuditHandler(req, res, next, "deep");
 });

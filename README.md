@@ -140,9 +140,9 @@ Pay-per-audit with USDC on Base mainnet. No accounts, no subscriptions.
 
 | Tier | Price | Features |
 |------|-------|----------|
-| Quick | $0.05 | YARA malware scan |
-| Standard | $0.15 | + Permission analysis + Network detection |
-| Deep | $0.50 | + Behavioral sandbox + Signed attestation |
+| Quick | $0.01 | YARA malware scan |
+| Standard | $0.05 | + Permission analysis + Network detection |
+| Deep | $0.10 | + Behavioral sandbox + Signed attestation |
 
 ## x402 Payment Flow
 
@@ -329,9 +329,9 @@ For production, the default is `https://x402guard.xyz` (no env needed).
 | `/api/skill.json` | GET | Free | Structured metadata |
 | `/api/health` | GET | Free | Health check |
 | `/api/pricing` | GET | Free | Pricing info |
-| `/api/audit/quick` | POST | $0.05 | YARA malware scan |
-| `/api/audit/standard` | POST | $0.15 | + Permissions + Network |
-| `/api/audit/deep` | POST | $0.50 | + Sandbox + Attestation |
+| `/api/audit/quick` | POST | $0.01 | YARA malware scan |
+| `/api/audit/standard` | POST | $0.05 | + Permissions + Network |
+| `/api/audit/deep` | POST | $0.10 | + Sandbox + Attestation |
 
 ## Links
 

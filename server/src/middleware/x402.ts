@@ -2,7 +2,7 @@
  * x402 Payment Middleware
  *
  * This middleware gates the /audit endpoint behind x402 payments.
- * Supports tiered pricing: quick ($0.05), standard ($0.15), deep ($0.50)
+ * Supports tiered pricing: quick ($0.01), standard ($0.05), deep ($0.10)
  */
 
 import { paymentMiddleware } from "@x402/express";
@@ -12,11 +12,11 @@ import { createFacilitatorConfig } from "@coinbase/x402";
 import { config } from "../config/index.js";
 
 // Pricing in USDC atomic units (6 decimals)
-// $0.05 = 50000, $0.15 = 150000, $0.50 = 500000
+// $0.01 = 10000, $0.05 = 50000, $0.10 = 100000
 export const TIER_PRICES = {
-  quick: 50000n,    // $0.05 USDC
-  standard: 150000n, // $0.15 USDC
-  deep: 500000n,     // $0.50 USDC
+  quick: 10000n,    // $0.01 USDC
+  standard: 50000n, // $0.05 USDC
+  deep: 100000n,    // $0.10 USDC
 } as const;
 
 export type AuditTier = keyof typeof TIER_PRICES;
@@ -48,7 +48,7 @@ export function createX402Middleware(): any {
         accepts: [
           {
             scheme: "exact",
-            price: "$0.05",
+            price: "$0.01",
             network: NETWORK,
             payTo: PAY_TO,
           },
@@ -60,7 +60,7 @@ export function createX402Middleware(): any {
         accepts: [
           {
             scheme: "exact",
-            price: "$0.15",
+            price: "$0.05",
             network: NETWORK,
             payTo: PAY_TO,
           },
@@ -72,7 +72,7 @@ export function createX402Middleware(): any {
         accepts: [
           {
             scheme: "exact",
-            price: "$0.50",
+            price: "$0.10",
             network: NETWORK,
             payTo: PAY_TO,
           },
@@ -84,7 +84,7 @@ export function createX402Middleware(): any {
         accepts: [
           {
             scheme: "exact",
-            price: "$0.05",
+            price: "$0.01",
             network: NETWORK,
             payTo: PAY_TO,
           },
@@ -103,17 +103,17 @@ export function createX402Middleware(): any {
 export function getPricingInfo() {
   return {
     quick: {
-      price: "$0.05",
+      price: "$0.01",
       description: "YARA scan only",
       features: ["Malware signature detection", "Basic pattern matching"],
     },
     standard: {
-      price: "$0.15",
+      price: "$0.05",
       description: "YARA + permissions + network analysis",
       features: ["All quick features", "Permission analysis", "Network call detection", "Dependency scanning"],
     },
     deep: {
-      price: "$0.50",
+      price: "$0.10",
       description: "Full analysis + detailed report",
       features: ["All standard features", "Deep code analysis", "Risk scoring", "Remediation suggestions"],
     },

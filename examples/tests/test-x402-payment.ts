@@ -115,7 +115,7 @@ async function main() {
 
   // Test 3: Standard audit with payment (malicious skill)
   console.log("\n4. Testing standard audit with payment (malicious skill)...");
-  console.log("   Price: $0.15 USDC");
+  console.log("   Price: $0.05 USDC");
   try {
     const auditRes = await fetchWithPayment(`${API_URL}/audit/standard`, {
       method: "POST",
@@ -156,7 +156,7 @@ async function main() {
   console.log("\n" + "=".repeat(60));
   console.log("All tests completed!");
   console.log("=".repeat(60));
-  console.log("\nTotal cost: $0.20 USDC (quick $0.05 + standard $0.15)");
+  console.log("\nTotal cost: $0.06 USDC (quick $0.01 + standard $0.05)");
   console.log("Check wallet balance and transaction history on Basescan:");
   console.log(`https://basescan.org/address/${signer.address}`);
 }

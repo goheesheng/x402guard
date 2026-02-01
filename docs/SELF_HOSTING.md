@@ -44,9 +44,9 @@ Server runs at `http://localhost:3000`
 | `CDP_API_KEY_SECRET` | Yes | - | Coinbase CDP API key secret |
 | `X402_NETWORK` | No | `eip155:8453` | Base mainnet. Use `eip155:84532` for testnet |
 | `X402_FACILITATOR_URL` | No | CDP URL | x402 facilitator endpoint |
-| `PRICE_QUICK` | No | `50000` | Price in USDC atomic units ($0.05) |
-| `PRICE_STANDARD` | No | `150000` | Price in USDC atomic units ($0.15) |
-| `PRICE_DEEP` | No | `500000` | Price in USDC atomic units ($0.50) |
+| `PRICE_QUICK` | No | `10000` | Price in USDC atomic units ($0.01) |
+| `PRICE_STANDARD` | No | `50000` | Price in USDC atomic units ($0.05) |
+| `PRICE_DEEP` | No | `100000` | Price in USDC atomic units ($0.10) |
 | `PORT` | No | `3000` | Server port |
 
 ## Deploy to Vercel

@@ -128,9 +128,9 @@ Audit a skill file for security threats.
 
 | Tier | Price | Features |
 |------|-------|----------|
-| quick | $0.05 | YARA malware scan |
-| standard | $0.15 | + Permission analysis + Network detection |
-| deep | $0.50 | + Behavioral sandbox + Signed attestation |
+| quick | $0.01 | YARA malware scan |
+| standard | $0.05 | + Permission analysis + Network detection |
+| deep | $0.10 | + Behavioral sandbox + Signed attestation |
 
 #### Request
 

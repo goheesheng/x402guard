@@ -20,7 +20,7 @@ const client = new X402GuardClient({
 // Audit a skill
 const result = await client.auditSkill({
   skillUrl: 'https://clawdhub.com/skills/weather',
-  tier: 'standard', // $0.15 USDC
+  tier: 'standard', // $0.05 USDC
 });
 
 console.log(result.risk_level);      // 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
@@ -32,9 +32,9 @@ console.log(result.findings);         // { malware, permissions, network, creden
 
 | Tier | Price | Features |
 |------|-------|----------|
-| `quick` | $0.05 | YARA malware scan |
-| `standard` | $0.15 | Full analysis + permissions + network |
-| `deep` | $0.50 | Complete audit + behavioral sandbox |
+| `quick` | $0.01 | YARA malware scan |
+| `standard` | $0.05 | Full analysis + permissions + network |
+| `deep` | $0.10 | Complete audit + behavioral sandbox |
 
 ## API
 
@@ -58,9 +58,9 @@ await client.health();
 await client.auditSkill({ skillUrl, tier });
 
 // Convenience methods
-await client.quickAudit(skillUrl);    // $0.05
-await client.standardAudit(skillUrl); // $0.15
-await client.deepAudit(skillUrl);     // $0.50
+await client.quickAudit(skillUrl);    // $0.01
+await client.standardAudit(skillUrl); // $0.05
+await client.deepAudit(skillUrl);     // $0.10
 
 // Check if safe to install
 const safe = await client.isSafe(skillUrl);

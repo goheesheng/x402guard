@@ -210,9 +210,9 @@ x402guard uses the x402 protocol for pay-per-audit pricing:
 
 | Tier | Price | What You Get |
 |------|-------|--------------|
-| Quick | $0.05 | YARA malware scan |
-| Standard | $0.15 | + Permission analysis + Network detection |
-| Deep | $0.50 | + Behavioral sandbox + Signed attestation |
+| Quick | $0.01 | YARA malware scan |
+| Standard | $0.05 | + Permission analysis + Network detection |
+| Deep | $0.10 | + Behavioral sandbox + Signed attestation |
 
 No accounts. No subscriptions. Pay with USDC on Base mainnet.
 

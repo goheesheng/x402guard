@@ -28,8 +28,8 @@
 | Test | Tier | Price | Status |
 |------|------|-------|--------|
 | Payment without header | - | - | Returns 402 as expected |
-| Quick audit (clean skill) | quick | $0.05 | PASS |
-| Standard audit (malicious skill) | standard | $0.15 | PASS |
+| Quick audit (clean skill) | quick | $0.01 | PASS |
+| Standard audit (malicious skill) | standard | $0.05 | PASS |
 
 ### Malware Detection
 
@@ -73,8 +73,8 @@
 
 ## Payment Verification
 
-- **Total payments processed:** $0.20 USDC
-- **Breakdown:** $0.05 (quick) + $0.15 (standard)
+- **Total payments processed:** $0.06 USDC
+- **Breakdown:** $0.01 (quick) + $0.05 (standard)
 - **Payment method:** x402 protocol via Coinbase CDP facilitator
 - **Settlement:** Base Mainnet USDC
 
@@ -103,9 +103,9 @@
 | /api/health | GET | Free | Health check |
 | /api/pricing | GET | Free | Pricing information |
 | /api/audit | GET | Free | API documentation |
-| /api/audit/quick | POST | $0.05 | YARA malware scan |
-| /api/audit/standard | POST | $0.15 | Full analysis + permissions + network |
-| /api/audit/deep | POST | $0.50 | Complete audit + attestation |
+| /api/audit/quick | POST | $0.01 | YARA malware scan |
+| /api/audit/standard | POST | $0.05 | Full analysis + permissions + network |
+| /api/audit/deep | POST | $0.10 | Complete audit + attestation |
 
 ## Next Steps
 
@@ -118,6 +118,6 @@
 
 All tests passed successfully. The x402 payment flow is working correctly on Base mainnet with:
 - Proper payment validation (402 for unpaid requests)
-- Correct USDC pricing ($0.05, $0.15, $0.50)
+- Correct USDC pricing ($0.01, $0.05, $0.10)
 - Accurate malware detection (credential theft, data exfiltration)
 - Clean skill pass-through (no false positives)

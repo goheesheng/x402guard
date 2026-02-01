@@ -99,7 +99,7 @@ interface AuditRequest {
   /** Raw skill content (alternative to skillUrl) */
   skillContent?: string;
 
-  /** Audit tier: 'quick' ($0.05), 'standard' ($0.15), 'deep' ($0.50) */
+  /** Audit tier: 'quick' ($0.01), 'standard' ($0.05), 'deep' ($0.10) */
   tier?: 'quick' | 'standard' | 'deep';
 }
 ```
@@ -134,7 +134,7 @@ const result = await client.auditSkill({
 
 ### `quickAudit(skillUrl: string): Promise<AuditResult>`
 
-Shorthand for quick tier audit ($0.05 USDC).
+Shorthand for quick tier audit ($0.01 USDC).
 
 ```typescript
 const result = await client.quickAudit('https://clawdhub.com/skills/weather');
@@ -144,7 +144,7 @@ const result = await client.quickAudit('https://clawdhub.com/skills/weather');
 
 ### `standardAudit(skillUrl: string): Promise<AuditResult>`
 
-Shorthand for standard tier audit ($0.15 USDC).
+Shorthand for standard tier audit ($0.05 USDC).
 
 ```typescript
 const result = await client.standardAudit('https://clawdhub.com/skills/weather');
@@ -154,7 +154,7 @@ const result = await client.standardAudit('https://clawdhub.com/skills/weather')
 
 ### `deepAudit(skillUrl: string): Promise<AuditResult>`
 
-Shorthand for deep tier audit ($0.50 USDC).
+Shorthand for deep tier audit ($0.10 USDC).
 
 ```typescript
 const result = await client.deepAudit('https://clawdhub.com/skills/weather');
@@ -309,9 +309,9 @@ interface Permission {
 ```typescript
 import { PRICING } from 'x402guard-client';
 
-console.log(PRICING.quick);    // { price: 50000, usd: 0.05 }
-console.log(PRICING.standard); // { price: 150000, usd: 0.15 }
-console.log(PRICING.deep);     // { price: 500000, usd: 0.50 }
+console.log(PRICING.quick);    // { price: 10000, usd: 0.01 }
+console.log(PRICING.standard); // { price: 50000, usd: 0.05 }
+console.log(PRICING.deep);     // { price: 100000, usd: 0.10 }
 ```
 
 Price values are in USDC atomic units (6 decimals).
@@ -374,7 +374,7 @@ const balance = await client.readContract({
 const balanceUSD = Number(balance) / 1e6;
 console.log(`USDC Balance: $${balanceUSD.toFixed(2)}`);
 
-if (balanceUSD < 0.15) {
+if (balanceUSD < 0.05) {
   console.log('Insufficient balance for standard audit');
 }
 ```

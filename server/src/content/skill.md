@@ -25,9 +25,9 @@ Key endpoints:
   GET  /api/health              → health check (free)
   GET  /api/skill.md            → this document (free)
   GET  /api/skill.json          → structured metadata (free)
-  POST /api/audit/quick         → $0.05 YARA malware scan
-  POST /api/audit/standard      → $0.15 + permissions + network analysis
-  POST /api/audit/deep          → $0.50 + behavioral sandbox + attestation
+  POST /api/audit/quick         → $0.01 YARA malware scan
+  POST /api/audit/standard      → $0.05 + permissions + network analysis
+  POST /api/audit/deep          → $0.10 + behavioral sandbox + attestation
 
 Request body: {"skill_url": "https://..."} OR {"skill_content": "---\nname:..."}
 Response: {"risk_score": 0-100, "risk_level": "LOW|MEDIUM|HIGH|CRITICAL",
@@ -266,9 +266,9 @@ Scan with x402guard
 | GET | `/api/skill.json` | Free | Structured metadata (JSON) |
 | GET | `/api/skills/x402guard.md` | Free | Alternative path (ClawHub style) |
 | GET | `/api/audit` | Free | Pricing info and endpoint docs |
-| POST | `/api/audit/quick` | $0.05 | YARA malware scan |
-| POST | `/api/audit/standard` | $0.15 | + Permission & network analysis |
-| POST | `/api/audit/deep` | $0.50 | + Behavioral sandbox & attestation |
+| POST | `/api/audit/quick` | $0.01 | YARA malware scan |
+| POST | `/api/audit/standard` | $0.05 | + Permission & network analysis |
+| POST | `/api/audit/deep` | $0.10 | + Behavioral sandbox & attestation |
 
 ### Request Format
 

@@ -7,19 +7,19 @@ import { fadeInUp, stagger } from "@/lib/animations";
 import { ExternalLink } from "lucide-react";
 
 const codeExamples = {
-  curl: `# Quick scan ($0.05)
+  curl: `# Quick scan ($0.01)
 curl -X POST http://x402guard.xyz/audit/quick \\
   -H "Content-Type: application/json" \\
   -H "X-Payment: <x402-payment-token>" \\
   -d '{"skill_url": "https://clawdhub.com/skills/weather"}'
 
-# Standard scan ($0.15)
+# Standard scan ($0.05)
 curl -X POST http://x402guard.xyz/audit/standard \\
   -H "Content-Type: application/json" \\
   -H "X-Payment: <x402-payment-token>" \\
   -d '{"skill_url": "https://clawdhub.com/skills/weather"}'
 
-# Deep scan ($0.50)
+# Deep scan ($0.10)
 curl -X POST http://x402guard.xyz/audit/deep \\
   -H "Content-Type: application/json" \\
   -H "X-Payment: <x402-payment-token>" \\

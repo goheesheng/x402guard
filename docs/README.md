@@ -97,9 +97,9 @@ x402guard uses the [x402 protocol](https://x402.org) for payments:
 
 | Tier | Price | Features |
 |------|-------|----------|
-| Quick | $0.05 | YARA malware scan |
-| Standard | $0.15 | + Permission analysis + Network detection |
-| Deep | $0.50 | + Behavioral sandbox + Signed attestation |
+| Quick | $0.01 | YARA malware scan |
+| Standard | $0.05 | + Permission analysis + Network detection |
+| Deep | $0.10 | + Behavioral sandbox + Signed attestation |
 
 No accounts, no subscriptions - just pay per audit with your agent wallet.
 
@@ -132,9 +132,9 @@ if (result.recommendation === 'SAFE') {
 | `/skill.json` | GET | Free | Structured metadata |
 | `/health` | GET | Free | Health check |
 | `/pricing` | GET | Free | Pricing info |
-| `/audit/quick` | POST | $0.05 | YARA malware scan |
-| `/audit/standard` | POST | $0.15 | + Permissions + Network |
-| `/audit/deep` | POST | $0.50 | + Sandbox + Attestation |
+| `/audit/quick` | POST | $0.01 | YARA malware scan |
+| `/audit/standard` | POST | $0.05 | + Permissions + Network |
+| `/audit/deep` | POST | $0.10 | + Sandbox + Attestation |
 
 ## Detection Rules
 
