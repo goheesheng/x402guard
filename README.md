@@ -197,6 +197,52 @@ The `PAYMENT-REQUIRED` header (base64-encoded) contains:
 - **Asset**: USDC (`0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`)
 - **Amount**: In atomic units (6 decimals) — `50000` = $0.05
 
+## AI Agent Integration (SKILL.md)
+
+x402guard provides a SKILL.md file that teaches AI agents (OpenClaw, LangChain, etc.) how to use the scanning API autonomously.
+
+### For AI Agents
+
+Fetch the skill document to learn how to use x402guard:
+
+```bash
+# Get the teaching document (markdown)
+curl https://x402guard.xyz/skill.md
+
+# Get structured metadata (JSON)
+curl https://x402guard.xyz/skill.json
+```
+
+The SKILL.md includes:
+- API endpoint documentation
+- x402 payment flow instructions
+- Code examples (curl, TypeScript)
+- Response interpretation guide
+
+### OpenClaw Integration
+
+The skill follows OpenClaw's format with proper metadata:
+
+```yaml
+---
+name: x402guard
+description: Pre-install security scanning for AI agent skills
+metadata:
+  openclaw:
+    requires:
+      env: [WALLET_PRIVATE_KEY]
+---
+```
+
+### Available Skill Endpoints
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /skill.md` | SKILL.md as markdown |
+| `GET /skill.json` | Structured metadata as JSON |
+| `GET /skills/x402guard.md` | ClawHub-style path |
+| `GET /skills/x402guard.json` | ClawHub-style JSON |
+
 ## Documentation
 
 **Core Concepts**

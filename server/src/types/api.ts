@@ -90,3 +90,49 @@ export interface ErrorResponse {
   details?: string;
   suggestion?: string;
 }
+
+// SKILL.md Metadata Types (for AI agent integration)
+
+export interface EndpointInfo {
+  method: string;
+  path: string;
+  description: string;
+  price_usdc: string;
+}
+
+export interface SkillMetadata {
+  name: string;
+  description: string;
+  version: string;
+  author: string;
+  metadata: {
+    openclaw: {
+      requires: {
+        env: string[];
+        bins: string[];
+      };
+    };
+  };
+  endpoints: {
+    audit_quick: EndpointInfo;
+    audit_standard: EndpointInfo;
+    audit_deep: EndpointInfo;
+    health: EndpointInfo;
+  };
+  pricing: {
+    network: string;
+    asset: string;
+    asset_name: string;
+    decimals: number;
+    tiers: {
+      quick: string;
+      standard: string;
+      deep: string;
+    };
+  };
+  documentation: {
+    homepage: string;
+    api_reference: string;
+    skill_md: string;
+  };
+}

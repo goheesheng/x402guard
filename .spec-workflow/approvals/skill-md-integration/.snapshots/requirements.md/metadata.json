@@ -1,0 +1,22 @@
+{
+  "filePath": ".spec-workflow/specs/skill-md-integration/requirements.md",
+  "currentVersion": 2,
+  "snapshots": [
+    {
+      "version": 1,
+      "filename": "snapshot-001.json",
+      "timestamp": "2026-02-01T06:14:44.474Z",
+      "trigger": "initial",
+      "approvalId": "approval_1769926484472_prz2h49yp",
+      "approvalTitle": "SKILL.md Integration Requirements"
+    },
+    {
+      "version": 2,
+      "filename": "snapshot-002.json",
+      "timestamp": "2026-02-01T06:15:22.768Z",
+      "trigger": "approved",
+      "approvalId": "approval_1769926484472_prz2h49yp",
+      "approvalTitle": "SKILL.md Integration Requirements"
+    }
+  ]
+}

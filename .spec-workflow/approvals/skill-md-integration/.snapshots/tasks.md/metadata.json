@@ -1,0 +1,22 @@
+{
+  "filePath": ".spec-workflow/specs/skill-md-integration/tasks.md",
+  "currentVersion": 2,
+  "snapshots": [
+    {
+      "version": 1,
+      "filename": "snapshot-001.json",
+      "timestamp": "2026-02-01T06:17:27.571Z",
+      "trigger": "initial",
+      "approvalId": "approval_1769926647569_9m9de5hmx",
+      "approvalTitle": "SKILL.md Integration Tasks"
+    },
+    {
+      "version": 2,
+      "filename": "snapshot-002.json",
+      "timestamp": "2026-02-01T06:18:54.149Z",
+      "trigger": "approved",
+      "approvalId": "approval_1769926647569_9m9de5hmx",
+      "approvalTitle": "SKILL.md Integration Tasks"
+    }
+  ]
+}

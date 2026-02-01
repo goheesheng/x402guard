@@ -4,6 +4,7 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import healthRouter from "./routes/health.js";
 import pricingRouter from "./routes/pricing.js";
 import auditRouter from "./routes/audit.js";
+import skillRouter from "./routes/skill.js";
 
 export function createServer(): Express {
   const app: Express = express();
@@ -33,7 +34,8 @@ export function createServer(): Express {
   // Routes (free)
   app.use(healthRouter);
   app.use(pricingRouter);
-  
+  app.use(skillRouter);
+
   // Routes (paid - x402)
   app.use(auditRouter);
   

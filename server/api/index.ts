@@ -144,7 +144,7 @@ app.get('/', (_req: any, res: any) => {
     version: '0.1.0',
     description: 'x402-powered security auditing for AI agent skills',
     endpoints: {
-      free: ['/health', '/pricing'],
+      free: ['/health', '/pricing', '/skill.md', '/skill.json'],
       paid: {
         '/audit/quick': { price: '$0.05', description: 'YARA malware scan' },
         '/audit/standard': { price: '$0.15', description: 'Full analysis + permissions + network' },
@@ -153,10 +153,131 @@ app.get('/', (_req: any, res: any) => {
     },
     payment: {
       network: NETWORK,
-      facilitator: FACILITATOR_URL,
       payTo: PAY_TO,
     }
   });
+});
+
+// SKILL.md content (embedded for serverless)
+const SKILL_MD_CONTENT = `---
+name: x402guard
+description: Pre-install security scanning for AI agent skills. Detects malware, credential theft, and data exfiltration. Pay per scan with USDC via x402 protocol.
+version: 0.1.0
+author: x402guard
+metadata:
+  openclaw:
+    requires:
+      env:
+        - WALLET_PRIVATE_KEY
+      bins: []
+---
+
+# x402guard Skill
+
+Scan AI agent skills for security threats **before installation**. x402guard detects:
+- Credential theft (env vars, SSH keys, AWS credentials)
+- Data exfiltration (HTTP POST to external servers)
+- Malware patterns (reverse shells, destructive commands)
+- Obfuscation techniques (base64, hex encoding)
+
+## Quick Start
+
+\`\`\`bash
+curl -X POST https://x402guard.xyz/audit/quick \\
+  -H "Content-Type: application/json" \\
+  -d '{"skill_content": "# My Skill\\n\\nRun: echo hello"}'
+\`\`\`
+
+## Available Endpoints
+
+| Endpoint | Price | What You Get |
+|----------|-------|--------------|
+| \`POST /audit/quick\` | $0.05 USDC | YARA malware scan |
+| \`POST /audit/standard\` | $0.15 USDC | + Permission analysis + Network detection |
+| \`POST /audit/deep\` | $0.50 USDC | + Behavioral sandbox + Signed attestation |
+
+## Payment Flow (x402)
+
+1. Send audit request (returns 402 Payment Required)
+2. Decode PAYMENT-REQUIRED header (base64 JSON)
+3. Sign payment with wallet using x402 SDK
+4. Retry request with X-PAYMENT header
+5. Receive audit result
+
+## Understanding Results
+
+| Recommendation | Meaning | Action |
+|----------------|---------|--------|
+| \`SAFE\` | No threats detected | OK to install |
+| \`CAUTION\` | Minor concerns | Review findings |
+| \`DANGEROUS\` | Significant threats | Do NOT install |
+| \`BLOCKED\` | Critical malware | NEVER install |
+
+## Network Info
+
+- **Network**: Base Mainnet (eip155:8453)
+- **Asset**: USDC (0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913)
+- **Protocol**: x402 V2 (https://x402.org)
+
+## Links
+
+- **Documentation**: https://github.com/goheesheng/x402guard
+- **x402 Protocol**: https://x402.org
+`;
+
+// Skill metadata JSON
+const SKILL_METADATA = {
+  name: "x402guard",
+  description: "Pre-install security scanning for AI agent skills. Detects malware, credential theft, and data exfiltration. Pay per scan with USDC via x402 protocol.",
+  version: "0.1.0",
+  author: "x402guard",
+  metadata: {
+    openclaw: {
+      requires: {
+        env: ["WALLET_PRIVATE_KEY"],
+        bins: [],
+      },
+    },
+  },
+  endpoints: {
+    audit_quick: { method: "POST", path: "/audit/quick", description: "Quick YARA malware scan", price_usdc: "$0.05" },
+    audit_standard: { method: "POST", path: "/audit/standard", description: "Full analysis with permission and network detection", price_usdc: "$0.15" },
+    audit_deep: { method: "POST", path: "/audit/deep", description: "Complete audit with behavioral sandbox and signed attestation", price_usdc: "$0.50" },
+    health: { method: "GET", path: "/health", description: "Health check endpoint", price_usdc: "free" },
+  },
+  pricing: {
+    network: NETWORK,
+    asset: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    asset_name: "USDC",
+    decimals: 6,
+    tiers: { quick: "50000", standard: "150000", deep: "500000" },
+  },
+  documentation: {
+    homepage: "https://github.com/goheesheng/x402guard",
+    api_reference: "https://x402guard.xyz/audit",
+    skill_md: "https://x402guard.xyz/skill.md",
+  },
+};
+
+// SKILL.md endpoint (free)
+app.get('/skill.md', (_req: any, res: any) => {
+  res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+  res.send(SKILL_MD_CONTENT);
+});
+
+// Skill JSON endpoint (free)
+app.get('/skill.json', (_req: any, res: any) => {
+  res.json(SKILL_METADATA);
+});
+
+// ClawHub-style alternative paths
+app.get('/skills/x402guard.md', (_req: any, res: any) => {
+  res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+  res.send(SKILL_MD_CONTENT);
+});
+
+app.get('/skills/x402guard.json', (_req: any, res: any) => {
+  res.json(SKILL_METADATA);
 });
 
 // Real audit function using the audit engine
