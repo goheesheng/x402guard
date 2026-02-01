@@ -6,10 +6,13 @@ import { logger } from "./utils/logger.js";
 
 const app: Express = createServer();
 
-// For local development
-if (process.env.NODE_ENV !== "production") {
+// Start server (for both local and production)
+// Vercel will ignore this and use the exported app directly
+const isVercel = process.env.VERCEL === "1" || process.env.VERCEL === "true";
+
+if (!isVercel) {
   app.listen(config.PORT, () => {
-    logger.info(`🛡️ x402guard API running on port ${config.PORT}`);
+    logger.info(`x402guard API running on port ${config.PORT}`);
     logger.info(`Environment: ${config.NODE_ENV}`);
     logger.info(`x402 Network: ${config.X402_NETWORK}`);
   });
