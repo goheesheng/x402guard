@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  x402guard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      # Server config
+      - NODE_ENV=production
+      - PORT=3000
+      # x402 Configuration (set these in .env or pass via docker run)
+      - X402_PAY_TO_ADDRESS=${X402_PAY_TO_ADDRESS}
+      - X402_NETWORK=eip155:8453
+      - X402_FACILITATOR_URL=https://api.cdp.coinbase.com/platform/v2/x402
+      # Coinbase CDP API Credentials
+      - CDP_API_KEY_ID=${CDP_API_KEY_ID}
+      - CDP_API_KEY_SECRET=${CDP_API_KEY_SECRET}
+      # Pricing (USDC atomic units)
+      - PRICE_QUICK=50000
+      - PRICE_STANDARD=150000
+      - PRICE_DEEP=500000
+      # Backend URL for Next.js
+      - BACKEND_API_URL=http://localhost:3001
+    volumes:
+      # Persist logs
+      - x402guard-logs:/var/log/x402guard
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  x402guard-logs:

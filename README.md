@@ -207,10 +207,10 @@ Fetch the skill document to learn how to use x402guard:
 
 ```bash
 # Get the teaching document (markdown)
-curl https://x402guard.xyz/skill.md
+curl https://x402guard.xyz/api/skill.md
 
 # Get structured metadata (JSON)
-curl https://x402guard.xyz/skill.json
+curl https://x402guard.xyz/api/skill.json
 ```
 
 The SKILL.md includes:
@@ -238,10 +238,10 @@ metadata:
 
 | Endpoint | Description |
 |----------|-------------|
-| `GET /skill.md` | SKILL.md as markdown |
-| `GET /skill.json` | Structured metadata as JSON |
-| `GET /skills/x402guard.md` | ClawHub-style path |
-| `GET /skills/x402guard.json` | ClawHub-style JSON |
+| `GET /api/skill.md` | SKILL.md as markdown |
+| `GET /api/skill.json` | Structured metadata as JSON |
+| `GET /api/skills/x402guard.md` | ClawHub-style path |
+| `GET /api/skills/x402guard.json` | ClawHub-style JSON |
 
 ## Documentation
 
@@ -262,16 +262,31 @@ metadata:
 - [Risk Scoring](./docs/RISK_SCORING.md) — How scores work
 - [Self-Hosting](./docs/SELF_HOSTING.md) — Run your own server
 
+## Web UI (Coming Soon)
+
+x402guard will include a modern web interface for scanning skills without writing code:
+
+- **Human/Agent Toggle** - Tailored onboarding for both audiences
+- **Interactive Scanner** - Paste URL or skill content, select tier, scan
+- **Visual Results** - Risk score gauge, findings breakdown, recommendations
+- **Wallet Integration** - Connect MetaMask, pay with USDC on Base
+
+The web UI will be available at `https://x402guard.xyz` once deployed.
+
 ## Project Structure
 
 ```
-x402guard/
+skillguard-monorepo/
+├── apps/
+│   └── web/               # Next.js web UI (coming soon)
 ├── server/                # Express API server
 │   └── src/
 │       ├── services/      # Audit engine, YARA scanner
-│       └── routes/        # API endpoints
+│       ├── routes/        # API endpoints
+│       └── content/       # SKILL.md content
 ├── packages/
-│   └── x402guard-client/  # TypeScript SDK
+│   ├── x402guard-client/  # TypeScript SDK
+│   └── shared-types/      # Shared TypeScript types
 ├── examples/              # Usage examples
 └── docs/                  # Documentation
 ```
@@ -289,11 +304,23 @@ pnpm dev:server
 pnpm build
 ```
 
+## API Endpoints
+
+| Endpoint | Method | Price | Description |
+|----------|--------|-------|-------------|
+| `/api/skill.md` | GET | Free | SKILL.md teaching document |
+| `/api/skill.json` | GET | Free | Structured metadata |
+| `/api/health` | GET | Free | Health check |
+| `/api/pricing` | GET | Free | Pricing info |
+| `/api/audit/quick` | POST | $0.05 | YARA malware scan |
+| `/api/audit/standard` | POST | $0.15 | + Permissions + Network |
+| `/api/audit/deep` | POST | $0.50 | + Sandbox + Attestation |
+
 ## Links
 
+- **Production API**: https://x402guard.xyz
 - **x402 Protocol**: https://x402.org
-- **x402-secure (t54)**: https://github.com/t54-labs/x402-secure
-- **ClawdHub**: https://clawdhub.com
+- **ClawHub**: https://clawhub.com
 
 ---
 

@@ -19,9 +19,9 @@
 
 | Endpoint | Status | Response |
 |----------|--------|----------|
-| GET /health | PASS | `{ status: "ok", version: "0.1.0", uptime: number }` |
-| GET /pricing | PASS | Returns 3 tiers with correct pricing |
-| GET /audit | PASS | Returns pricing info and endpoint documentation |
+| GET /api/health | PASS | `{ status: "ok", version: "0.1.0", uptime: number }` |
+| GET /api/pricing | PASS | Returns 3 tiers with correct pricing |
+| GET /api/audit | PASS | Returns pricing info and endpoint documentation |
 
 ### x402 Payment Flow
 
@@ -100,12 +100,12 @@
 
 | Endpoint | Method | Price | Description |
 |----------|--------|-------|-------------|
-| /health | GET | Free | Health check |
-| /pricing | GET | Free | Pricing information |
-| /audit | GET | Free | API documentation |
-| /audit/quick | POST | $0.05 | YARA malware scan |
-| /audit/standard | POST | $0.15 | Full analysis + permissions + network |
-| /audit/deep | POST | $0.50 | Complete audit + attestation |
+| /api/health | GET | Free | Health check |
+| /api/pricing | GET | Free | Pricing information |
+| /api/audit | GET | Free | API documentation |
+| /api/audit/quick | POST | $0.05 | YARA malware scan |
+| /api/audit/standard | POST | $0.15 | Full analysis + permissions + network |
+| /api/audit/deep | POST | $0.50 | Complete audit + attestation |
 
 ## Next Steps
 

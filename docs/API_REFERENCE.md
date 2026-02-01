@@ -4,7 +4,7 @@ Complete API documentation for x402guard.
 
 ## Base URL
 
-- **Production**: `https://x402guard.vercel.app`
+- **Production**: `https://x402guard.xyz`
 - **Self-hosted**: Your deployment URL
 
 ## Authentication
@@ -13,10 +13,86 @@ x402guard uses [x402](https://x402.org) for payment authentication. Include the 
 
 ## Endpoints
 
+### Skill Document (skill.md)
+
+```
+GET /api/skill.md
+```
+
+Free endpoint returning the SKILL.md teaching document for AI agents.
+
+**Response:** `text/markdown`
+
+```markdown
+---
+name: x402guard
+description: Pre-install security scanning for AI agent skills
+version: 1.0.0
+metadata:
+  openclaw:
+    requires:
+      env: [WALLET_PRIVATE_KEY]
+---
+
+# x402guard - Security Scanning for AI Skills
+...
+```
+
+---
+
+### Skill Metadata (skill.json)
+
+```
+GET /api/skill.json
+```
+
+Free endpoint returning structured skill metadata as JSON.
+
+**Response:**
+```json
+{
+  "name": "x402guard",
+  "description": "Pre-install security scanning for AI agent skills...",
+  "version": "1.0.0",
+  "author": "x402guard",
+  "homepage": "https://x402guard.xyz",
+  "metadata": {
+    "openclaw": {
+      "requires": {
+        "env": ["WALLET_PRIVATE_KEY"],
+        "bins": []
+      }
+    }
+  },
+  "endpoints": {
+    "audit_quick": {
+      "method": "POST",
+      "path": "/api/audit/quick",
+      "description": "Quick YARA malware scan ($0.05 USDC)",
+      "price_usdc": "0.05",
+      "requires_payment": true
+    }
+  },
+  "pricing": {
+    "network": "Base Mainnet (eip155:8453)",
+    "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    "asset_name": "USDC",
+    "decimals": 6,
+    "tiers": {
+      "quick": "0.05",
+      "standard": "0.15",
+      "deep": "0.50"
+    }
+  }
+}
+```
+
+---
+
 ### Health Check
 
 ```
-GET /health
+GET /api/health
 ```
 
 Free endpoint to check API status.
@@ -35,7 +111,7 @@ Free endpoint to check API status.
 ### Pricing Info
 
 ```
-GET /pricing
+GET /api/pricing
 ```
 
 Free endpoint returning current pricing.
@@ -85,11 +161,11 @@ Returns API information and pricing.
   "version": "0.1.0",
   "description": "x402-powered security auditing for AI agent skills",
   "endpoints": {
-    "free": ["/health", "/pricing"],
+    "free": ["/api/health", "/api/pricing"],
     "paid": {
-      "/audit/quick": { "price": "$0.05", "description": "YARA malware scan" },
-      "/audit/standard": { "price": "$0.15", "description": "Full analysis + permissions + network" },
-      "/audit/deep": { "price": "$0.50", "description": "Complete audit + behavioral sandbox" }
+      "/api/audit/quick": { "price": "$0.05", "description": "YARA malware scan" },
+      "/api/audit/standard": { "price": "$0.15", "description": "Full analysis + permissions + network" },
+      "/api/audit/deep": { "price": "$0.50", "description": "Complete audit + behavioral sandbox" }
     }
   },
   "payment": {
@@ -105,7 +181,7 @@ Returns API information and pricing.
 ### Quick Audit
 
 ```
-POST /audit/quick
+POST /api/audit/quick
 ```
 
 **Price:** $0.05 USDC
@@ -145,7 +221,7 @@ Fast YARA-based malware scan.
 ### Standard Audit
 
 ```
-POST /audit/standard
+POST /api/audit/standard
 ```
 
 **Price:** $0.15 USDC
@@ -159,7 +235,7 @@ Same request/response format as Quick Audit, with more detailed findings.
 ### Deep Audit
 
 ```
-POST /audit/deep
+POST /api/audit/deep
 ```
 
 **Price:** $0.50 USDC

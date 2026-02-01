@@ -1,0 +1,22 @@
+{
+  "filePath": ".spec-workflow/specs/skill-md-enhancement/requirements.md",
+  "currentVersion": 2,
+  "snapshots": [
+    {
+      "version": 1,
+      "filename": "snapshot-001.json",
+      "timestamp": "2026-02-01T08:09:31.343Z",
+      "trigger": "initial",
+      "approvalId": "approval_1769933371341_wry1hwiw6",
+      "approvalTitle": "SKILL.md Enhancement Requirements"
+    },
+    {
+      "version": 2,
+      "filename": "snapshot-002.json",
+      "timestamp": "2026-02-01T08:10:01.786Z",
+      "trigger": "approved",
+      "approvalId": "approval_1769933371341_wry1hwiw6",
+      "approvalTitle": "SKILL.md Enhancement Requirements"
+    }
+  ]
+}

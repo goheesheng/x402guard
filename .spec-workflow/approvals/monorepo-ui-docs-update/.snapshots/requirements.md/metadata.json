@@ -1,0 +1,22 @@
+{
+  "filePath": ".spec-workflow/specs/monorepo-ui-docs-update/requirements.md",
+  "currentVersion": 2,
+  "snapshots": [
+    {
+      "version": 1,
+      "filename": "snapshot-001.json",
+      "timestamp": "2026-02-01T07:35:42.803Z",
+      "trigger": "initial",
+      "approvalId": "approval_1769931342800_wu7jpeu1c",
+      "approvalTitle": "Requirements: Monorepo UI, Documentation & SKILL.md Update"
+    },
+    {
+      "version": 2,
+      "filename": "snapshot-002.json",
+      "timestamp": "2026-02-01T07:36:33.617Z",
+      "trigger": "approved",
+      "approvalId": "approval_1769931342800_wu7jpeu1c",
+      "approvalTitle": "Requirements: Monorepo UI, Documentation & SKILL.md Update"
+    }
+  ]
+}

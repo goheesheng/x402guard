@@ -291,10 +291,10 @@ Server runs at `http://localhost:3000`
 
 ```bash
 # Health check
-curl http://localhost:3000/health
+curl http://localhost:3000/api/health
 
 # Pricing info
-curl http://localhost:3000/pricing
+curl http://localhost:3000/api/pricing
 
 # Test audit (requires x402 payment)
 # Use the test script:

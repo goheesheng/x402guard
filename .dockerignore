@@ -1,0 +1,49 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build outputs (we rebuild in Docker)
+dist
+**/dist
+.next
+**/.next
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Environment files (pass via docker-compose or env vars)
+.env
+**/.env
+!**/.env.example
+
+# Docs and specs (not needed in production)
+docs
+.spec-workflow
+*.md
+!README.md
+
+# Tests
+**/*.test.ts
+**/*.spec.ts
+__tests__
+coverage
+
+# Examples
+examples
+
+# Debug logs
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db

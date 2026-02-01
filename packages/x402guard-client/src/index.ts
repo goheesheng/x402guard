@@ -147,7 +147,7 @@ export class X402GuardClient {
    * Check API health (free endpoint)
    */
   async health(): Promise<HealthResponse> {
-    const response = await fetch(`${this.apiUrl}/health`);
+    const response = await fetch(`${this.apiUrl}/api/health`);
     if (!response.ok) {
       throw new Error(`Health check failed: ${response.status}`);
     }
@@ -178,7 +178,7 @@ export class X402GuardClient {
     const tier = request.tier || 'standard';
     const fetchFn = await this.initPayment();
 
-    const response = await fetchFn(`${this.apiUrl}/audit/${tier}`, {
+    const response = await fetchFn(`${this.apiUrl}/api/audit/${tier}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

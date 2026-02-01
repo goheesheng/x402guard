@@ -6,8 +6,8 @@ dotenvConfig();
 
 const envSchema = z.object({
   // Base URL for resources
-  BASE_URL: z.string().url().default("http://localhost:3000"),
-  PORT: z.string().default("3000").transform(Number),
+  BASE_URL: z.string().url().default("http://localhost:3001"),
+  PORT: z.string().default("3001").transform(Number),
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 
   // x402 - MAINNET CONFIG

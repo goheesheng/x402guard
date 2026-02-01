@@ -105,7 +105,7 @@ const CUSTOM_RULES: Rule[] = [
 ## Monitoring
 
 The server exposes:
-- `GET /health` - Health check endpoint
+- `GET /api/health` - Health check endpoint
 - Logs to stdout in JSON format
 
 ## Security Considerations

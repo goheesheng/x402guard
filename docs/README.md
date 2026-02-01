@@ -1,5 +1,15 @@
 # x402guard Documentation
 
+> Pre-install security auditing for AI agent skills — powered by x402
+
+## Quick Links
+
+| Document | Description |
+|----------|-------------|
+| [Quickstart](./QUICKSTART.md) | Get started in 5 minutes |
+| [API Reference](./API_REFERENCE.md) | HTTP API documentation |
+| [SDK Reference](./SDK_REFERENCE.md) | TypeScript SDK (X402GuardClient) |
+
 ## Core Concepts
 
 - [The Problem](./PROBLEM.md) - Why skill security matters
@@ -10,24 +20,42 @@
 
 - [Quickstart](./QUICKSTART.md) - Get started in 5 minutes
 - [SDK Reference](./SDK_REFERENCE.md) - X402GuardClient API
-- [Agent Integration](./AGENT_INTEGRATION.md) - Integrate with AI agents
+- [Agent Integration](./AGENT_INTEGRATION.md) - Integrate with AI agents (OpenClaw, LangChain)
 - [Deployment](./DEPLOYMENT.md) - Deploy to production
+- [AWS Deployment](./AWS_DEPLOYMENT.md) - Deploy to AWS
 
 ## Reference
 
 - [API Reference](./API_REFERENCE.md) - HTTP API documentation
-- [Detection Rules](./DETECTION_RULES.md) - YARA-style pattern matching
+- [Detection Rules](./DETECTION_RULES.md) - YARA-style pattern matching (10 rules, 40+ patterns)
 - [Risk Scoring](./RISK_SCORING.md) - How scores are calculated
 - [Self-Hosting](./SELF_HOSTING.md) - Run your own x402guard server
 
 ## Overview
 
-x402guard provides pre-install security auditing for AI agent skills. Before installing any skill from ClawdHub or other sources, use x402guard to:
+x402guard provides pre-install security auditing for AI agent skills. Before installing any skill from ClawHub or other sources, use x402guard to:
 
 1. **Detect malware** - YARA-based scanning for credential stealers, backdoors
 2. **Analyze permissions** - What files/network access does the skill need?
 3. **Check network calls** - Does it phone home to suspicious endpoints?
 4. **Get risk score** - 0-100 score with clear recommendation
+
+## AI Agent Integration
+
+x402guard serves a SKILL.md file that teaches AI agents how to use the API:
+
+```bash
+# Get the teaching document (markdown)
+curl https://x402guard.xyz/api/skill.md
+
+# Get structured metadata (JSON)
+curl https://x402guard.xyz/api/skill.json
+```
+
+AI agents can read skill.md to learn:
+- How to call audit endpoints
+- How to handle x402 payments
+- How to interpret results
 
 ## Architecture
 
@@ -63,9 +91,9 @@ x402guard provides pre-install security auditing for AI agent skills. Before ins
 
 x402guard uses the [x402 protocol](https://x402.org) for payments:
 
-- **Network**: Base (mainnet)
-- **Asset**: USDC
-- **Pricing**: $0.05 - $0.50 per audit
+- **Network**: Base Mainnet (Chain ID: 8453)
+- **Asset**: USDC (0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913)
+- **Protocol**: x402 v2
 
 | Tier | Price | Features |
 |------|-------|----------|
@@ -85,11 +113,47 @@ const client = new X402GuardClient({
 });
 
 const result = await client.auditSkill({
-  skillUrl: 'https://clawdhub.com/skills/weather',
+  skillUrl: 'https://clawhub.com/skills/weather',
   tier: 'standard',
 });
 
 if (result.recommendation === 'SAFE') {
   console.log('✅ Safe to install');
+} else if (result.recommendation === 'BLOCKED') {
+  console.log('❌ Malware detected:', result.findings.malware);
 }
 ```
+
+## API Endpoints
+
+| Endpoint | Method | Price | Description |
+|----------|--------|-------|-------------|
+| `/skill.md` | GET | Free | SKILL.md teaching document |
+| `/skill.json` | GET | Free | Structured metadata |
+| `/health` | GET | Free | Health check |
+| `/pricing` | GET | Free | Pricing info |
+| `/audit/quick` | POST | $0.05 | YARA malware scan |
+| `/audit/standard` | POST | $0.15 | + Permissions + Network |
+| `/audit/deep` | POST | $0.50 | + Sandbox + Attestation |
+
+## Detection Rules
+
+x402guard detects these threat categories:
+
+| Category | Severity | Examples |
+|----------|----------|----------|
+| Credential Theft (env) | CRITICAL | `process.env.AWS_SECRET` |
+| Credential Theft (files) | CRITICAL | `.ssh/id_rsa`, `.aws/credentials` |
+| Data Exfiltration | HIGH | `curl --data`, `fetch POST` |
+| Reverse Shell | CRITICAL | `nc -e`, `bash -i` |
+| Destructive Commands | CRITICAL | `rm -rf /`, `mkfs` |
+| Code Execution | HIGH | `eval()`, `child_process` |
+| Obfuscation | HIGH | `atob()`, `String.fromCharCode` |
+
+See [Detection Rules](./DETECTION_RULES.md) for the full list of 10 YARA rules and 40+ patterns.
+
+## Links
+
+- **Production API**: https://x402guard.xyz
+- **x402 Protocol**: https://x402.org
+- **ClawHub**: https://clawhub.com

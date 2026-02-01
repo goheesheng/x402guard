@@ -62,13 +62,13 @@ const result = await auditSkill({
 
 ```bash
 # Quick audit ($0.05)
-curl -X POST https://x402guard.vercel.app/audit/quick \
+curl -X POST https://x402guard.xyz/api/audit/quick \
   -H "Content-Type: application/json" \
   -H "X-Payment: <x402-payment-token>" \
   -d '{"skill_url": "https://clawdhub.com/skills/weather"}'
 
 # Standard audit ($0.15)
-curl -X POST https://x402guard.vercel.app/audit/standard \
+curl -X POST https://x402guard.xyz/api/audit/standard \
   -H "Content-Type: application/json" \
   -H "X-Payment: <x402-payment-token>" \
   -d '{"skill_url": "https://clawdhub.com/skills/weather"}'

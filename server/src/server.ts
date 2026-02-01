@@ -31,13 +31,11 @@ export function createServer(): Express {
     next();
   });
   
-  // Routes (free)
-  app.use(healthRouter);
-  app.use(pricingRouter);
-  app.use(skillRouter);
-
-  // Routes (paid - x402)
-  app.use(auditRouter);
+  // Routes (all under /api prefix)
+  app.use("/api", healthRouter);
+  app.use("/api", pricingRouter);
+  app.use("/api", skillRouter);
+  app.use("/api", auditRouter);
   
   // Error handler
   app.use(errorHandler);
