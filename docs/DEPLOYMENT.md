@@ -1,398 +1,335 @@
 # Deployment Guide
 
-Deploy x402guard to production using Vercel, Docker, or a VPS.
+Deploy x402guard to AWS EC2 with Ubuntu.
 
-## Quick Start (Vercel)
+## Prerequisites
 
-The fastest way to deploy x402guard:
+- AWS Account with EC2 access
+- Domain name (optional, for HTTPS)
+- Your wallet address for receiving USDC payments
+- Coinbase CDP API credentials
 
-```bash
-# 1. Clone the repo
-git clone https://github.com/goheesheng/x402guard.git
-cd x402guard
+## Quick Start
 
-# 2. Install Vercel CLI
-npm i -g vercel
+### 1. Launch EC2 Instance
 
-# 3. Deploy
-cd server
-vercel --prod
+**AWS Console Settings:**
 
-# 4. Set environment variables in Vercel Dashboard
-```
+| Setting | Value |
+|---------|-------|
+| AMI | Ubuntu Server 24.04 LTS |
+| Instance Type | t3.micro (free tier) or t3.small |
+| Key Pair | Create or select existing |
+| Security Group | See below |
 
-## Environment Variables
+**Security Group Inbound Rules:**
 
-### Required Variables
+| Type | Port | Source |
+|------|------|--------|
+| SSH | 22 | Your IP |
+| HTTP | 80 | 0.0.0.0/0 |
+| HTTPS | 443 | 0.0.0.0/0 |
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `X402_PAY_TO_ADDRESS` | Your wallet address for receiving USDC payments | `0xdc7f6ebefe62a...` |
-| `CDP_API_KEY_ID` | Coinbase CDP API key ID | `your-key-id` |
-| `CDP_API_KEY_SECRET` | Coinbase CDP API key secret | `your-key-secret` |
-
-### Optional Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `X402_NETWORK` | `eip155:8453` | Base mainnet. Use `eip155:84532` for testnet |
-| `X402_FACILITATOR_URL` | CDP URL | x402 facilitator endpoint |
-| `PRICE_QUICK` | `50000` | Quick tier price in USDC atomic units ($0.05) |
-| `PRICE_STANDARD` | `150000` | Standard tier price ($0.15) |
-| `PRICE_DEEP` | `500000` | Deep tier price ($0.50) |
-| `PORT` | `3000` | Server port |
-| `NODE_ENV` | `development` | Set to `production` for prod |
-
-## Getting CDP Credentials
-
-x402guard uses Coinbase CDP (Cloud Developer Platform) for x402 payment verification.
-
-### Step 1: Create CDP Account
-
-1. Go to [Coinbase Developer Platform](https://portal.cdp.coinbase.com/)
-2. Sign up or log in
-3. Create a new project
-
-### Step 2: Create API Key
-
-1. Navigate to **API Keys** in your project
-2. Click **Create API Key**
-3. Select permissions: `x402:read`, `x402:write`
-4. Save your **Key ID** and **Key Secret** securely
-
-### Step 3: Configure Environment
+### 2. SSH into Instance
 
 ```bash
-# .env
-CDP_API_KEY_ID=your-key-id-here
-CDP_API_KEY_SECRET=your-key-secret-here
-X402_PAY_TO_ADDRESS=0xYourWalletAddress
+ssh -i your-key.pem ubuntu@<your-ec2-public-ip>
 ```
 
-**Warning:** Never commit CDP credentials to version control.
-
----
-
-## Deployment Options
-
-### Option 1: Vercel (Recommended)
-
-Best for: Quick deployment, automatic scaling, global CDN
+### 3. Install Dependencies
 
 ```bash
-# From the server directory
-cd server
-
-# Deploy to Vercel
-vercel --prod
-```
-
-Then configure environment variables in the Vercel Dashboard:
-
-1. Go to your project settings
-2. Navigate to **Environment Variables**
-3. Add all required variables
-4. Redeploy
-
-**vercel.json** (already configured):
-
-```json
-{
-  "version": 2,
-  "builds": [
-    {
-      "src": "dist/index.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "dist/index.js"
-    }
-  ]
-}
-```
-
----
-
-### Option 2: Docker
-
-Best for: Kubernetes, Docker Compose, container orchestration
-
-**Dockerfile:**
-
-```dockerfile
-FROM node:20-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-COPY pnpm-lock.yaml ./
-RUN npm install -g pnpm && pnpm install
-COPY . .
-RUN pnpm build
-
-FROM node:20-alpine
-WORKDIR /app
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./
-EXPOSE 3000
-ENV NODE_ENV=production
-CMD ["node", "dist/index.js"]
-```
-
-**Build and run:**
-
-```bash
-# Build image
-docker build -t x402guard .
-
-# Run container
-docker run -d \
-  -p 3000:3000 \
-  -e X402_PAY_TO_ADDRESS=0xYourWallet \
-  -e CDP_API_KEY_ID=your-key-id \
-  -e CDP_API_KEY_SECRET=your-key-secret \
-  -e NODE_ENV=production \
-  --name x402guard \
-  x402guard
-```
-
-**Docker Compose:**
-
-```yaml
-version: '3.8'
-services:
-  x402guard:
-    build: ./server
-    ports:
-      - "3000:3000"
-    environment:
-      - X402_PAY_TO_ADDRESS=${X402_PAY_TO_ADDRESS}
-      - CDP_API_KEY_ID=${CDP_API_KEY_ID}
-      - CDP_API_KEY_SECRET=${CDP_API_KEY_SECRET}
-      - X402_NETWORK=eip155:8453
-      - NODE_ENV=production
-    restart: unless-stopped
-```
-
----
-
-### Option 3: VPS (Manual)
-
-Best for: Full control, custom configurations
-
-**1. Setup server:**
-
-```bash
-# SSH into your VPS
-ssh user@your-server.com
+# Update system
+sudo apt update && sudo apt upgrade -y
 
 # Install Node.js 20
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt-get install -y nodejs
+sudo apt install -y nodejs
 
 # Install pnpm
-npm install -g pnpm
+sudo npm install -g pnpm
 
-# Clone and build
+# Install PM2
+sudo npm install -g pm2
+
+# Install nginx and certbot
+sudo apt install nginx certbot python3-certbot-nginx -y
+```
+
+### 4. Clone Repository
+
+```bash
+cd ~
 git clone https://github.com/goheesheng/x402guard.git
-cd x402guard/server
+cd x402guard
 pnpm install
+```
+
+### 5. Configure Environment
+
+**Server `.env`:**
+
+```bash
+nano ~/x402guard/server/.env
+```
+
+```env
+PORT=3001
+NODE_ENV=production
+
+X402_PAY_TO_ADDRESS=0xYourWalletAddress
+X402_FACILITATOR_URL=https://api.cdp.coinbase.com/platform/v2/x402
+X402_NETWORK=eip155:8453
+
+CDP_API_KEY_ID=your-cdp-key-id
+CDP_API_KEY_SECRET=your-cdp-key-secret
+
+# Pricing (USDC atomic units, 6 decimals)
+# $0.01 = 10000, $0.05 = 50000, $0.10 = 100000
+PRICE_QUICK=10000
+PRICE_STANDARD=50000
+PRICE_DEEP=100000
+
+MAX_SKILL_SIZE=1048576
+RATE_LIMIT_WINDOW=60000
+RATE_LIMIT_MAX=100
+```
+
+**Web `.env`:**
+
+```bash
+nano ~/x402guard/apps/web/.env
+```
+
+```env
+NEXT_PUBLIC_API_URL=https://yourdomain.com
+```
+
+### 6. Build
+
+```bash
+cd ~/x402guard
 pnpm build
 ```
 
-**2. Configure environment:**
+### 7. Configure Nginx
 
 ```bash
-# Create .env file
-cat > .env << EOF
-X402_PAY_TO_ADDRESS=0xYourWalletAddress
-CDP_API_KEY_ID=your-key-id
-CDP_API_KEY_SECRET=your-key-secret
-X402_NETWORK=eip155:8453
-NODE_ENV=production
-PORT=3000
-EOF
+sudo nano /etc/nginx/sites-available/x402guard
 ```
-
-**3. Run with PM2:**
-
-```bash
-# Install PM2
-npm install -g pm2
-
-# Start the server
-pm2 start dist/index.js --name x402guard
-
-# Auto-start on reboot
-pm2 startup
-pm2 save
-```
-
-**4. Configure Nginx (reverse proxy):**
 
 ```nginx
-# /etc/nginx/sites-available/x402guard
 server {
     listen 80;
-    server_name x402guard.yourdomain.com;
+    server_name yourdomain.com www.yourdomain.com;
+    return 301 https://yourdomain.com$request_uri;
+}
 
+server {
+    listen 443 ssl;
+    server_name yourdomain.com www.yourdomain.com;
+
+    ssl_certificate /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    # Frontend (Next.js on port 3000)
     location / {
         proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
         proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
         proxy_cache_bypass $http_upgrade;
+    }
+
+    # API (Express on port 3001)
+    location /api/ {
+        proxy_pass http://localhost:3001/api/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # x402 payment headers
+        proxy_set_header X-PAYMENT $http_x_payment;
+        proxy_set_header Payment $http_payment;
+        proxy_pass_header X-PAYMENT;
+        proxy_pass_header Payment;
+        proxy_pass_request_headers on;
+    }
+
+    # Static files
+    location /_next/static {
+        proxy_pass http://localhost:3000/_next/static;
+        proxy_cache_valid 60m;
+        add_header Cache-Control "public, immutable, max-age=31536000";
     }
 }
 ```
 
+Enable the site:
+
 ```bash
-# Enable site
-sudo ln -s /etc/nginx/sites-available/x402guard /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl reload nginx
+sudo ln -sf /etc/nginx/sites-available/x402guard /etc/nginx/sites-enabled/
+sudo rm -f /etc/nginx/sites-enabled/default
+sudo nginx -t && sudo systemctl reload nginx
 ```
 
-**5. Add SSL with Certbot:**
+### 8. Setup SSL (after DNS is configured)
 
 ```bash
-sudo apt install certbot python3-certbot-nginx
-sudo certbot --nginx -d x402guard.yourdomain.com
+sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
+```
+
+### 9. Start with PM2
+
+```bash
+cd ~/x402guard
+pm2 start ecosystem.config.js
+pm2 save
+pm2 startup
+```
+
+### 10. Verify Deployment
+
+```bash
+# Check processes
+pm2 status
+
+# Test API
+curl https://yourdomain.com/api/health
+
+# Check logs
+pm2 logs
 ```
 
 ---
 
-## Local Development
+## DNS Configuration (GoDaddy Example)
 
-For local testing and development:
+Add these A records:
 
-```bash
-# Clone repo
-git clone https://github.com/goheesheng/x402guard.git
-cd x402guard
+| Type | Name | Value | TTL |
+|------|------|-------|-----|
+| A | @ | your-ec2-ip | 600 |
+| A | www | your-ec2-ip | 600 |
 
-# Install dependencies
-pnpm install
+**Important:** Delete any conflicting records (like WebsiteBuilder).
 
-# Configure environment
-cp server/.env.example server/.env
-# Edit server/.env with your values
-
-# Start development server
-pnpm dev:server
-```
-
-Server runs at `http://localhost:3000`
-
-### Testing Locally
+Wait 5-30 minutes for DNS propagation. Verify:
 
 ```bash
-# Health check
-curl http://localhost:3000/api/health
-
-# Pricing info
-curl http://localhost:3000/api/pricing
-
-# Test audit (requires x402 payment)
-# Use the test script:
-cd examples/tests
-PRIVATE_KEY=your-wallet-key npx tsx test-x402-payment.ts
+nslookup yourdomain.com 8.8.8.8
 ```
 
 ---
 
-## Monitoring
-
-### Health Check
+## Updating the Application
 
 ```bash
-curl https://your-api.com/health
+cd ~/x402guard
+git pull
+pnpm build
+pm2 restart all
 ```
 
-Response:
-```json
-{
-  "status": "ok",
-  "version": "1.0.0",
-  "uptime": 3600
-}
-```
+If you get git conflicts:
 
-### Logs
-
-The server logs to stdout in JSON format:
-
-```
-[INFO] x402guard API running on port 3000
-[INFO] Environment: production
-[INFO] x402 Network: eip155:8453
-[INFO] POST /audit/quick
-[INFO] POST /audit/standard
-```
-
-### Payment Monitoring
-
-Monitor your receiving wallet on Basescan:
-
-```
-https://basescan.org/address/YOUR_WALLET_ADDRESS
+```bash
+git stash
+git pull
+git stash pop
 ```
 
 ---
 
-## Security Checklist
+## Useful Commands
 
-- [ ] Never commit `.env` or credentials to git
-- [ ] Use HTTPS in production (TLS termination)
-- [ ] Set `NODE_ENV=production`
-- [ ] Enable rate limiting (built-in)
-- [ ] Monitor wallet for suspicious activity
-- [ ] Keep Node.js and dependencies updated
-- [ ] Use secrets manager for CDP credentials in production
+| Command | Description |
+|---------|-------------|
+| `pm2 status` | Check running processes |
+| `pm2 logs` | View all logs |
+| `pm2 logs x402guard-api` | View API logs |
+| `pm2 logs x402guard-web` | View web logs |
+| `pm2 restart all` | Restart all processes |
+| `pm2 stop all` | Stop all processes |
+| `sudo nginx -t` | Test nginx config |
+| `sudo systemctl reload nginx` | Reload nginx |
+| `sudo certbot renew --dry-run` | Test SSL renewal |
 
 ---
 
 ## Troubleshooting
 
-### 401 Unauthorized from CDP
+### CSS not loading (raw @tailwind showing)
 
-```
-Error: Request failed with status 401
-```
-
-**Solution:** Check your CDP credentials are correct and have x402 permissions.
-
-### 402 Payment Required
-
-```
-Error: Payment Required
+```bash
+cd ~/x402guard/apps/web
+rm -rf .next
+rm postcss.config.mjs  # Remove old config if exists
+pnpm build
+pm2 restart x402guard-web
 ```
 
-**Solution:** This is expected when calling paid endpoints without x402 payment. Use the SDK or include proper payment headers.
+### API returning 502 Bad Gateway
 
-### Port Already in Use
-
-```
-Error: listen EADDRINUSE: address already in use :::3000
-```
-
-**Solution:** Change `PORT` environment variable or kill the process using port 3000.
-
-### Build Errors
-
-```
-Error: Cannot find module 'dist/index.js'
+```bash
+pm2 status  # Check if API is running
+pm2 logs x402guard-api  # Check for errors
+pm2 restart x402guard-api
 ```
 
-**Solution:** Run `pnpm build` before starting in production mode.
+### Domain not resolving
+
+1. Check DNS records in your registrar
+2. Delete conflicting A records
+3. Flush local DNS: `sudo dscacheutil -flushcache` (Mac)
+4. Test with Google DNS: `nslookup yourdomain.com 8.8.8.8`
+
+### Payment client not ready
+
+1. Ensure `NEXT_PUBLIC_API_URL` is set correctly in web `.env`
+2. Rebuild web app: `pnpm build`
+3. Hard refresh browser: `Ctrl+Shift+R`
 
 ---
 
-## Next Steps
+## Environment Variables Reference
 
-- [SDK Reference](./SDK_REFERENCE.md) — Integrate with your application
-- [API Reference](./API_REFERENCE.md) — HTTP API documentation
-- [Self-Hosting](./SELF_HOSTING.md) — Detailed self-hosting guide
+### Server (`server/.env`)
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `PORT` | No | API port (default: 3001) |
+| `NODE_ENV` | No | Environment (production) |
+| `X402_PAY_TO_ADDRESS` | Yes | Your wallet for USDC payments |
+| `CDP_API_KEY_ID` | Yes | Coinbase CDP API Key ID |
+| `CDP_API_KEY_SECRET` | Yes | Coinbase CDP API Secret |
+| `X402_NETWORK` | No | Network (default: eip155:8453) |
+| `PRICE_QUICK` | No | Quick tier price in atomic units |
+| `PRICE_STANDARD` | No | Standard tier price |
+| `PRICE_DEEP` | No | Deep tier price |
+
+### Web (`apps/web/.env`)
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `NEXT_PUBLIC_API_URL` | Yes | Full API URL (https://yourdomain.com) |
+
+---
+
+## Getting CDP Credentials
+
+1. Go to [Coinbase Developer Platform](https://portal.cdp.coinbase.com/)
+2. Create a new project
+3. Navigate to **API Keys**
+4. Create API Key with `x402:read`, `x402:write` permissions
+5. Save **Key ID** and **Key Secret** securely
+
+**Warning:** Never commit credentials to git.
