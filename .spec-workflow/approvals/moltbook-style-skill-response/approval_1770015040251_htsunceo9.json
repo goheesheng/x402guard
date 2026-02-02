@@ -1,0 +1,21 @@
+{
+  "id": "approval_1770015040251_htsunceo9",
+  "title": "Requirements: Moltbook-Style Skill Response",
+  "filePath": ".spec-workflow/specs/moltbook-style-skill-response/requirements.md",
+  "type": "document",
+  "status": "needs-revision",
+  "createdAt": "2026-02-02T06:50:40.251Z",
+  "category": "spec",
+  "categoryName": "moltbook-style-skill-response",
+  "response": "Feedback Summary (1 comments):\n\nGeneral Comments:\n1. Ensure clean API documentation that agents can consume without triggering prompt injection defenses, because right now when I run Read https://x402guard.xyz/api/skill.md and follow the instructions to scan a skill it returned a series of questions which can be complicated for the agent. \n\nHow ever I want it to be agent friendly as stated before\n\n",
+  "annotations": "{\n  \"decision\": \"needs-revision\",\n  \"comments\": [\n    {\n      \"type\": \"general\",\n      \"comment\": \"Ensure clean API documentation that agents can consume without triggering prompt injection defenses, because right now when I run Read https://x402guard.xyz/api/skill.md and follow the instructions to scan a skill it returned a series of questions which can be complicated for the agent. \\n\\nHow ever I want it to be agent friendly as stated before\",\n      \"timestamp\": \"2026-02-02T06:52:37.005Z\",\n      \"id\": \"comment_1770015157005_z3riczmg4\"\n    }\n  ],\n  \"summary\": \"Feedback Summary (1 comments):\\n\\nGeneral Comments:\\n1. Ensure clean API documentation that agents can consume without triggering prompt injection defenses, because right now when I run Read https://x402guard.xyz/api/skill.md and follow the instructions to scan a skill it returned a series of questions which can be complicated for the agent. \\n\\nHow ever I want it to be agent friendly as stated before\\n\\n\",\n  \"timestamp\": \"2026-02-02T06:52:38.328Z\"\n}",
+  "respondedAt": "2026-02-02T06:52:38.340Z",
+  "comments": [
+    {
+      "type": "general",
+      "comment": "Ensure clean API documentation that agents can consume without triggering prompt injection defenses, because right now when I run Read https://x402guard.xyz/api/skill.md and follow the instructions to scan a skill it returned a series of questions which can be complicated for the agent. \n\nHow ever I want it to be agent friendly as stated before",
+      "timestamp": "2026-02-02T06:52:37.005Z",
+      "id": "comment_1770015157005_z3riczmg4"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "filePath": ".spec-workflow/specs/moltbook-style-skill-response/tasks.md",
+  "currentVersion": 2,
+  "snapshots": [
+    {
+      "version": 1,
+      "filename": "snapshot-001.json",
+      "timestamp": "2026-02-02T06:58:59.527Z",
+      "trigger": "initial",
+      "approvalId": "approval_1770015539526_sg8udbc93",
+      "approvalTitle": "Tasks: Moltbook-Style Skill Response"
+    },
+    {
+      "version": 2,
+      "filename": "snapshot-002.json",
+      "timestamp": "2026-02-02T07:00:25.896Z",
+      "trigger": "approved",
+      "approvalId": "approval_1770015539526_sg8udbc93",
+      "approvalTitle": "Tasks: Moltbook-Style Skill Response"
+    }
+  ]
+}

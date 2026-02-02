@@ -1,0 +1,30 @@
+{
+  "filePath": ".spec-workflow/specs/moltbook-style-skill-response/design.md",
+  "currentVersion": 3,
+  "snapshots": [
+    {
+      "version": 1,
+      "filename": "snapshot-001.json",
+      "timestamp": "2026-02-02T06:55:09.178Z",
+      "trigger": "initial",
+      "approvalId": "approval_1770015309176_kcqmif1il",
+      "approvalTitle": "Design: Moltbook-Style Skill Response"
+    },
+    {
+      "version": 2,
+      "filename": "snapshot-002.json",
+      "timestamp": "2026-02-02T06:56:09.687Z",
+      "trigger": "revision_requested",
+      "approvalId": "approval_1770015309176_kcqmif1il",
+      "approvalTitle": "Design: Moltbook-Style Skill Response"
+    },
+    {
+      "version": 3,
+      "filename": "snapshot-003.json",
+      "timestamp": "2026-02-02T06:57:34.333Z",
+      "trigger": "approved",
+      "approvalId": "approval_1770015434656_wcvieibv3",
+      "approvalTitle": "Design: Moltbook-Style Skill Response (Revised)"
+    }
+  ]
+}

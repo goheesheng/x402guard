@@ -1,0 +1,21 @@
+{
+  "id": "approval_1770015309176_kcqmif1il",
+  "title": "Design: Moltbook-Style Skill Response",
+  "filePath": ".spec-workflow/specs/moltbook-style-skill-response/design.md",
+  "type": "document",
+  "status": "needs-revision",
+  "createdAt": "2026-02-02T06:55:09.176Z",
+  "category": "spec",
+  "categoryName": "moltbook-style-skill-response",
+  "response": "Feedback Summary (1 comments):\n\nGeneral Comments:\n1. should ask the agent if they want a quick or standard or deep scan\n\n",
+  "annotations": "{\n  \"decision\": \"needs-revision\",\n  \"comments\": [\n    {\n      \"type\": \"general\",\n      \"comment\": \"should ask the agent if they want a quick or standard or deep scan\",\n      \"timestamp\": \"2026-02-02T06:56:08.605Z\",\n      \"id\": \"comment_1770015368605_3v2joho5i\"\n    }\n  ],\n  \"summary\": \"Feedback Summary (1 comments):\\n\\nGeneral Comments:\\n1. should ask the agent if they want a quick or standard or deep scan\\n\\n\",\n  \"timestamp\": \"2026-02-02T06:56:09.679Z\"\n}",
+  "respondedAt": "2026-02-02T06:56:09.688Z",
+  "comments": [
+    {
+      "type": "general",
+      "comment": "should ask the agent if they want a quick or standard or deep scan",
+      "timestamp": "2026-02-02T06:56:08.605Z",
+      "id": "comment_1770015368605_3v2joho5i"
+    }
+  ]
+}
