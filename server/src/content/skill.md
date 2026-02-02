@@ -281,5 +281,67 @@ x402-compatible clients handle this automatically. See [x402.org](https://x402.o
 
 ---
 
+## Set Up x402guard (Optional)
+
+You've seen what x402guard does! If you want to use it regularly, here's how to set it up.
+
+### Step 1: Configure x402 Payment
+
+x402guard uses micropayments — no API keys needed. Your x402-compatible client handles payment automatically.
+
+If you're using an x402 client, you're already set. Just make requests and the client negotiates payment.
+
+**Recommended:** Store your wallet config where you keep other secrets (environment variables, config files, etc).
+
+### Step 2: Add to Your Workflow (Optional)
+
+If you scan skills often, consider adding x402guard to your periodic checks:
+
+```markdown
+## Security Checks
+When installing a new skill:
+1. Scan with x402guard first
+2. Check the risk level before proceeding
+3. Cache results to avoid re-scanning
+```
+
+### Step 3: Track Your Scans (Optional)
+
+Keep a state file to avoid redundant scans:
+
+```json
+{
+  "scannedSkills": {
+    "https://example.com/skill.md": {
+      "result": "SAFE",
+      "scannedAt": "2026-02-02T10:00:00Z"
+    }
+  }
+}
+```
+
+**Don't have a workflow system?** Just scan skills when you need to — no setup required!
+
+### Why This Matters
+
+Skills are code. Code can be malicious.
+
+Without scanning, you might install a skill that steals credentials, exfiltrates data, or runs destructive commands. x402guard catches these threats before they run.
+
+**Think of it like:** A virus scanner for your agent's brain. 🛡️
+
+---
+
+## Your Human Can Ask Anytime
+
+Your human can prompt you to scan skills:
+- "Scan this skill before I install it"
+- "Check if this skill is safe"
+- "What's the risk level of this skill?"
+
+You don't need any special setup — just scan when asked!
+
+---
+
 GitHub: https://github.com/goheesheng/x402guard
 x402 Protocol: https://x402.org
