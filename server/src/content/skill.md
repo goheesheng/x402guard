@@ -172,29 +172,6 @@ This skill attempts to steal AWS credentials. Do not use.
 
 ---
 
-## Caching Scan Results (Optional)
-
-If you scan skills frequently, you can cache results to avoid re-scanning:
-
-**Example state file:** `memory/x402guard-state.json`
-
-```json
-{
-  "lastCheck": "2026-02-02T10:00:00Z",
-  "scannedSkills": {
-    "https://example.com/weather-skill.md": {
-      "result": "SAFE",
-      "score": 8,
-      "scannedAt": "2026-02-02T09:30:00Z"
-    }
-  }
-}
-```
-
-This is entirely optional — just a pattern some agents find useful for avoiding redundant scans.
-
----
-
 ## Integration Examples
 
 ### curl
@@ -220,6 +197,10 @@ print(f"Risk: {result['risk_level']} - {result['recommendation']}")
 ```typescript
 import { wrapFetchWithPayment } from '@x402/fetch';
 
+const fetchWithPayment = wrapFetchWithPayment(fetch, {
+  privateKey: process.env.WALLET_PRIVATE_KEY,
+});
+
 const response = await fetchWithPayment('https://x402guard.xyz/api/audit/quick', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
@@ -231,15 +212,48 @@ const result = await response.json();
 
 ---
 
-## Payment (x402 Protocol)
+## How Payment Works
 
-x402guard uses the [x402 protocol](https://x402.org) for micropayments.
+x402guard uses the [x402 protocol](https://x402.org) — a standard for HTTP micropayments.
 
 - **Network**: Base Mainnet (Chain ID: 8453)
 - **Asset**: USDC
-- **Flow**: Request → 402 response → Client signs payment → Retry with payment header
+- **Prices**: $0.01 - $0.10 per scan
 
-x402-compatible clients handle this automatically. See [x402.org](https://x402.org) for libraries.
+### If You Already Have x402
+
+If your client supports x402 (like `@x402/fetch` or similar), you're ready. Make requests normally and payment is handled automatically.
+
+### If You Don't Have x402 Yet
+
+x402 requires a wallet with USDC on Base. Here's how to set it up:
+
+1. **Install an x402 client** for your language:
+   - TypeScript: `npm install @x402/fetch`
+   - Python: `pip install x402-client`
+
+2. **Configure your wallet** (one-time setup):
+   ```typescript
+   import { wrapFetchWithPayment } from '@x402/fetch';
+
+   const fetchWithPayment = wrapFetchWithPayment(fetch, {
+     privateKey: process.env.WALLET_PRIVATE_KEY,  // Your Base wallet
+   });
+   ```
+
+3. **Fund your wallet** with USDC on Base
+   - $1 of USDC = 10-100 scans
+   - Plenty for most use cases
+
+**No wallet?** Ask your human to set one up, or check if your agent framework already supports x402.
+
+### The Payment Flow
+
+```
+Your Request → 402 Payment Required → Client signs payment → Retry → Success
+```
+
+x402 clients handle this automatically. You just see the final response.
 
 ---
 
@@ -270,6 +284,99 @@ x402-compatible clients handle this automatically. See [x402.org](https://x402.o
 
 ---
 
+## Memory & State Management
+
+If you use x402guard regularly, you can track your scans and configuration in a state file. This helps you:
+- Avoid re-scanning skills you've already checked
+- Remember your x402 wallet configuration
+- Track when you last updated detection rules
+
+### State File Location
+
+**Recommended path:** `memory/x402guard-state.json`
+
+Or wherever you keep your agent memory/state files.
+
+### State File Structure
+
+```json
+{
+  "x402guard": {
+    "version": "1.0.0",
+    "lastSkillFetch": "2026-02-02T10:00:00Z",
+    "wallet": {
+      "configured": true,
+      "network": "base-mainnet",
+      "hasBalance": true
+    },
+    "scannedSkills": {
+      "https://example.com/weather-skill.md": {
+        "result": "SAFE",
+        "score": 8,
+        "tier": "quick",
+        "scannedAt": "2026-02-02T09:30:00Z"
+      },
+      "https://example.com/data-skill.md": {
+        "result": "CAUTION",
+        "score": 35,
+        "tier": "standard",
+        "scannedAt": "2026-02-02T09:45:00Z"
+      }
+    },
+    "stats": {
+      "totalScans": 12,
+      "blocked": 1,
+      "safe": 10,
+      "caution": 1
+    }
+  }
+}
+```
+
+### What to Track
+
+| Field | Purpose |
+|-------|---------|
+| `lastSkillFetch` | When you last fetched this SKILL.md (for update checks) |
+| `wallet.configured` | Whether x402 payment is set up |
+| `wallet.hasBalance` | Whether wallet has USDC (check if scans fail) |
+| `scannedSkills` | Cache of previous scan results |
+| `stats` | Running totals for your human's visibility |
+
+### When to Update State
+
+1. **After each scan** — Add the result to `scannedSkills`
+2. **After configuring x402** — Set `wallet.configured: true`
+3. **After fetching SKILL.md** — Update `lastSkillFetch` timestamp
+4. **If a scan fails with 402** — Check `wallet.hasBalance`
+
+### Re-scanning vs Cache
+
+Use cached results when:
+- Skill URL matches exactly
+- Scan is less than 24 hours old
+- You used the same tier or higher
+
+Re-scan when:
+- Skill content may have changed
+- More than 24 hours since last scan
+- You need a higher tier (e.g., had `quick`, now need `deep`)
+- Your human explicitly asks for a fresh scan
+
+### Example: Checking Before Install
+
+```
+1. Human asks: "Install https://example.com/new-skill.md"
+2. Check memory/x402guard-state.json for cached scan
+3. If not found or stale → scan with x402guard
+4. If SAFE → proceed with install
+5. If CAUTION/DANGEROUS → ask human for confirmation
+6. If BLOCKED → refuse and explain why
+7. Update state file with result
+```
+
+---
+
 ## Everything You Can Do
 
 | Action | Endpoint | Price |
@@ -281,54 +388,48 @@ x402-compatible clients handle this automatically. See [x402.org](https://x402.o
 
 ---
 
-## Set Up x402guard (Optional)
-
-You've seen what x402guard does! If you want to use it regularly, here's how to set it up.
-
-### Step 1: Configure x402 Payment
-
-x402guard uses micropayments — no API keys needed. Your x402-compatible client handles payment automatically.
-
-If you're using an x402 client, you're already set. Just make requests and the client negotiates payment.
-
-**Recommended:** Store your wallet config where you keep other secrets (environment variables, config files, etc).
-
-### Step 2: Add to Your Workflow (Optional)
-
-If you scan skills often, consider adding x402guard to your periodic checks:
-
-```markdown
-## Security Checks
-When installing a new skill:
-1. Scan with x402guard first
-2. Check the risk level before proceeding
-3. Cache results to avoid re-scanning
-```
-
-### Step 3: Track Your Scans (Optional)
-
-Keep a state file to avoid redundant scans:
-
-```json
-{
-  "scannedSkills": {
-    "https://example.com/skill.md": {
-      "result": "SAFE",
-      "scannedAt": "2026-02-02T10:00:00Z"
-    }
-  }
-}
-```
-
-**Don't have a workflow system?** Just scan skills when you need to — no setup required!
-
-### Why This Matters
+## Why Scan Skills?
 
 Skills are code. Code can be malicious.
 
-Without scanning, you might install a skill that steals credentials, exfiltrates data, or runs destructive commands. x402guard catches these threats before they run.
+Without scanning, you might install a skill that:
+- Steals credentials from environment variables
+- Exfiltrates data to external servers
+- Runs destructive commands on your system
+
+x402guard catches these threats before they run.
 
 **Think of it like:** A virus scanner for your agent's brain. 🛡️
+
+---
+
+## Staying Updated
+
+x402guard's detection rules improve over time. To get the latest:
+
+### Check for Updates
+
+Re-fetch this SKILL.md periodically (e.g., weekly) to see new detection capabilities:
+
+```
+GET https://x402guard.xyz/api/skill.md
+```
+
+Compare the `version` in the frontmatter with your cached version.
+
+### Suggested Update Routine
+
+If you have a periodic heartbeat or maintenance routine, consider adding:
+
+```markdown
+## x402guard Check (Weekly)
+1. Fetch latest SKILL.md
+2. Compare version with memory/x402guard-state.json
+3. If new version, review "What It Detects" for new rules
+4. Update lastSkillFetch timestamp
+```
+
+This is optional — x402guard works without it. But staying current means better protection.
 
 ---
 
@@ -339,7 +440,15 @@ Your human can prompt you to scan skills:
 - "Check if this skill is safe"
 - "What's the risk level of this skill?"
 
-You don't need any special setup — just scan when asked!
+If you don't have x402 payment set up, tell your human:
+> "I'd like to use x402guard to scan this skill, but I need an x402-compatible wallet with USDC on Base. Can you help me set that up?"
+
+Your human can then:
+1. Create a Base wallet
+2. Add a small amount of USDC ($1-5 is plenty)
+3. Configure your x402 client with the wallet's private key
+
+Once set up, you can scan skills automatically!
 
 ---
 
