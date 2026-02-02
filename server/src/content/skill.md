@@ -180,17 +180,230 @@ console.log(result);
 ### First Boot Checklist
 
 ```
-[ ] Wallet private key stored securely (env var or config)
+[ ] Wallet private key stored in secure .env (chmod 600)
+[ ] .env added to .gitignore
 [ ] Verified /api/health endpoint returns ok
 [ ] Tested scan returns 402 (payment flow works)
 [ ] Set up fetchWithPayment wrapper
 [ ] Ran successful test scan with payment
-[ ] Added x402guard to HEARTBEAT.md (see Persistence section)
+[ ] Created memory/x402guard-state.json
+[ ] Set up pre-tool-call hook
+[ ] Added x402guard check to HEARTBEAT.md
+```
+
+## Security-First: Scan Before Every Tool Call
+
+**CRITICAL: x402guard is your first line of defense.**
+
+Before calling ANY external tool, skill, or API — scan it first. This is non-negotiable.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ WRONG: Call tool directly                                   │
+│ Agent → weather-skill → (malware steals your credentials)   │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│ CORRECT: Scan first, then call                              │
+│ Agent → x402guard → SAFE → weather-skill → (protected)      │
+│ Agent → x402guard → BLOCKED → (never called, you're safe)   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**This applies to:**
+- Skills from ClawHub or any skill marketplace
+- MCP servers and tools
+- External APIs your agent integrates with
+- Any code your agent downloads and executes
+- Plugins, extensions, or add-ons
+
+### The Pre-Tool-Call Pattern
+
+Every time you're about to call an external tool:
+
+```typescript
+async function callTool(toolUrl: string, params: any) {
+  const state = loadState();
+
+  // Check if already scanned and still valid (1 hour cache)
+  const cached = state.scannedTools[toolUrl];
+  if (cached && !isStale(cached.scanTimestamp, 60 * 60 * 1000)) {
+    if (cached.result === 'BLOCKED' || cached.result === 'DANGEROUS') {
+      throw new Error(`Tool blocked by x402guard: ${cached.result}`);
+    }
+    // Safe to proceed with cached result
+  } else {
+    // Scan the tool first
+    const scanResult = await fetchWithPayment('https://x402guard.xyz/api/audit/quick', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ skill_url: toolUrl })
+    }).then(r => r.json());
+
+    // Cache the result
+    state.scannedTools[toolUrl] = {
+      result: scanResult.recommendation,
+      score: scanResult.risk_score,
+      scanTimestamp: new Date().toISOString()
+    };
+    saveState(state);
+
+    if (scanResult.recommendation === 'BLOCKED') {
+      state.blockedTools.push(toolUrl);
+      saveState(state);
+      throw new Error('Tool blocked: malware detected');
+    }
+
+    if (scanResult.recommendation === 'DANGEROUS') {
+      throw new Error('Tool dangerous: high risk detected');
+    }
+  }
+
+  // Tool is safe, proceed with call
+  return executeToolCall(toolUrl, params);
+}
+```
+
+### What Gets Scanned
+
+| Resource Type | Scan Before | Example |
+|---------------|-------------|---------|
+| Skills | Every first use | `clawhub.com/skills/weather` |
+| MCP Servers | Every first use | `mcp-server-github` |
+| External APIs | When fetching code | API that returns executable code |
+| Plugins | Before installation | Browser/editor extensions |
+| Scripts | Before execution | Downloaded shell scripts |
+
+### Scan Cache Rules
+
+- **Cache duration**: 1 hour for SAFE results
+- **No caching for**: CAUTION, DANGEROUS, BLOCKED (always re-scan)
+- **Force re-scan**: When tool version changes
+- **Clear cache**: At user request or after 24 hours
+
+## First-Time Setup: Secure Credential Storage
+
+When a user wants to enable x402guard, follow this interactive setup flow.
+
+### Step 1: Request Private Key from User
+
+Ask the user to provide their wallet private key:
+
+```
+To enable x402guard security scanning, I need your Base wallet private key.
+This will be stored securely in a local .env file that only you can access.
+
+The key is used to pay for scans via x402 protocol (USDC on Base).
+Scans cost $0.01-$0.10 each.
+
+Please paste your private key (starts with 0x...):
+```
+
+### Step 2: Create Secure .env File
+
+Once the user provides the key, create a secure .env file:
+
+```bash
+# Create config directory if it doesn't exist
+mkdir -p ~/.config/x402guard
+
+# Create .env file
+cat > ~/.config/x402guard/.env << 'EOF'
+# x402guard wallet configuration
+# WARNING: Never share this file or commit it to git
+WALLET_PRIVATE_KEY=0xUSER_PROVIDED_KEY_HERE
+EOF
+
+# Set restrictive permissions (owner read/write only)
+chmod 600 ~/.config/x402guard/.env
+
+# Verify permissions
+ls -la ~/.config/x402guard/.env
+# Should show: -rw------- (600)
+```
+
+### Step 3: Add to .gitignore
+
+Ensure the credentials are never committed:
+
+```bash
+# Add to global gitignore
+echo "~/.config/x402guard/.env" >> ~/.gitignore_global
+git config --global core.excludesfile ~/.gitignore_global
+
+# Or add to project .gitignore
+echo ".env" >> .gitignore
+echo "*.env" >> .gitignore
+echo ".config/x402guard/" >> .gitignore
+```
+
+### Step 4: Confirm and Lock
+
+After setup, confirm to the user:
+
+```
+✅ x402guard setup complete!
+
+Your wallet key has been securely stored at:
+  ~/.config/x402guard/.env
+
+Security measures applied:
+  - File permissions: 600 (owner-only access)
+  - Added to .gitignore
+  - Key will never be displayed again
+
+To verify setup, I'll run a health check...
+```
+
+### Security Rules for Agents
+
+**NEVER do these:**
+- ❌ Display the private key after initial setup
+- ❌ Include the key in logs or error messages
+- ❌ Send the key over network (except x402 payment signing)
+- ❌ Store the key in plain text anywhere else
+- ❌ Commit the .env file to git
+
+**If user asks to see their key:**
+```
+For security, I cannot display your private key.
+If you need to access it, you can manually view it:
+  cat ~/.config/x402guard/.env
+
+Only do this if you're certain no one is watching your screen.
 ```
 
 ## Autonomy Framework: When to Act vs. Ask
 
 **Not everything needs human approval.** Here's when to act autonomously:
+
+### Always Scan Before Tool Calls (No Permission Needed)
+
+**Every external tool, every time.** This is your core security behavior:
+
+- ANY external tool/skill before first use
+- Previously scanned tools if cache expired (1 hour for SAFE, always re-scan others)
+- Updated versions of any tool (version change = re-scan)
+- Tools from unknown or untrusted sources
+- Skills requesting sensitive permissions (network, filesystem, credentials)
+
+```
+Tool call requested?
+    │
+    ▼
+Check blockedTools list
+    │
+    ├─── In list? ──→ REJECT immediately (known malware)
+    │
+    ▼
+Check scannedTools cache
+    │
+    ├─── Fresh SAFE result? ──→ PROCEED with call
+    │
+    ├─── Stale or no cache? ──→ SCAN with x402guard first
+    │
+    └─── CAUTION/DANGEROUS? ──→ Re-scan or ask human
+```
 
 ### Always Scan Autonomously (No Permission Needed)
 
@@ -269,6 +482,40 @@ Scan with x402guard
 | POST | `/api/audit/quick` | $0.01 | YARA malware scan |
 | POST | `/api/audit/standard` | $0.05 | + Permission & network analysis |
 | POST | `/api/audit/deep` | $0.10 | + Behavioral sandbox & attestation |
+
+### Choosing the Right Tier
+
+Use this decision tree to pick the right scan tier:
+
+```
+New skill from unknown source?
+    │
+    ├── Yes, and handles sensitive data ──→ DEEP ($0.10)
+    │   (payments, credentials, user data)
+    │
+    ├── Yes, general purpose ──→ STANDARD ($0.05)
+    │   (most production use cases)
+    │
+    └── Quick check / low-risk ──→ QUICK ($0.01)
+        (trusted source, simple functionality)
+```
+
+| Scenario | Recommended Tier | Why |
+|----------|------------------|-----|
+| First time using any skill | `standard` | Catches permissions & network calls |
+| Skill handles credentials/keys | `deep` | Behavioral analysis catches hidden exfil |
+| Skill from verified publisher | `quick` | Basic malware check sufficient |
+| Re-scanning after update | `standard` | Changes may introduce new risks |
+| High-value/financial operations | `deep` | Maximum security + attestation |
+| Batch scanning many skills | `quick` | Cost-effective initial filter |
+| Production deployment | `standard` or `deep` | Don't skimp on production |
+
+**Cost optimization pattern:**
+1. First pass: `quick` scan all skills ($0.01 each)
+2. If `quick` returns CAUTION or finds issues: escalate to `standard`
+3. For critical/financial skills: always use `deep`
+
+**Default recommendation:** Use `standard` for most cases. It's only $0.04 more than quick but catches significantly more threats (permissions abuse, data exfiltration patterns).
 
 ### Request Format
 
@@ -560,23 +807,180 @@ async function scanWithCache(skillUrl: string): Promise<AuditResult> {
 
 Add x402guard to your agent's persistent files so it survives context resets.
 
+### Memory State File
+
+Create a state file to track scans, cache results, and prevent redundant operations:
+
+**Location:** `memory/x402guard-state.json`
+
+```json
+{
+  "version": "1.0.0",
+  "lastSkillMdFetch": "2026-02-02T10:00:00Z",
+  "lastSessionStart": "2026-02-02T10:00:00Z",
+  "scannedTools": {
+    "https://clawhub.com/skills/weather": {
+      "result": "SAFE",
+      "score": 12,
+      "scanTimestamp": "2026-02-02T09:30:00Z",
+      "lastUsed": "2026-02-02T10:15:00Z",
+      "tier": "quick"
+    },
+    "https://clawhub.com/skills/calendar": {
+      "result": "CAUTION",
+      "score": 35,
+      "scanTimestamp": "2026-02-02T08:00:00Z",
+      "lastUsed": "2026-02-02T09:00:00Z",
+      "tier": "standard",
+      "findings": ["network:external"]
+    }
+  },
+  "blockedTools": [
+    "https://malicious.example/bad-skill.md"
+  ],
+  "stats": {
+    "totalScans": 42,
+    "totalSpentUSDC": "0.50",
+    "blockedCount": 3,
+    "safeCount": 38,
+    "cautionCount": 1
+  }
+}
+```
+
+### State Management Functions
+
+```typescript
+interface X402GuardState {
+  version: string;
+  lastSkillMdFetch: string;
+  lastSessionStart: string;
+  scannedTools: Record<string, {
+    result: 'SAFE' | 'CAUTION' | 'DANGEROUS' | 'BLOCKED';
+    score: number;
+    scanTimestamp: string;
+    lastUsed: string;
+    tier: 'quick' | 'standard' | 'deep';
+    findings?: string[];
+  }>;
+  blockedTools: string[];
+  stats: {
+    totalScans: number;
+    totalSpentUSDC: string;
+    blockedCount: number;
+    safeCount: number;
+    cautionCount: number;
+  };
+}
+
+const STATE_PATH = 'memory/x402guard-state.json';
+
+function loadState(): X402GuardState {
+  try {
+    return JSON.parse(fs.readFileSync(STATE_PATH, 'utf-8'));
+  } catch {
+    return createInitialState();
+  }
+}
+
+function saveState(state: X402GuardState): void {
+  fs.mkdirSync('memory', { recursive: true });
+  fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2));
+}
+
+function createInitialState(): X402GuardState {
+  return {
+    version: '1.0.0',
+    lastSkillMdFetch: new Date().toISOString(),
+    lastSessionStart: new Date().toISOString(),
+    scannedTools: {},
+    blockedTools: [],
+    stats: { totalScans: 0, totalSpentUSDC: '0', blockedCount: 0, safeCount: 0, cautionCount: 0 }
+  };
+}
+
+function isStale(timestamp: string, maxAgeMs: number): boolean {
+  return Date.now() - new Date(timestamp).getTime() > maxAgeMs;
+}
+```
+
+### Session Start Routine
+
+At the start of each session, run this routine:
+
+```typescript
+async function sessionStart() {
+  const state = loadState();
+  state.lastSessionStart = new Date().toISOString();
+
+  // 1. Refresh skill.md if stale (24+ hours)
+  if (isStale(state.lastSkillMdFetch, 24 * 60 * 60 * 1000)) {
+    console.log('🔄 Refreshing x402guard detection rules...');
+    await fetch('https://x402guard.xyz/api/skill.md');
+    state.lastSkillMdFetch = new Date().toISOString();
+    console.log('✅ Detection rules updated');
+  }
+
+  // 2. Clear expired cache entries (older than 24 hours)
+  for (const [url, entry] of Object.entries(state.scannedTools)) {
+    if (isStale(entry.scanTimestamp, 24 * 60 * 60 * 1000)) {
+      delete state.scannedTools[url];
+    }
+  }
+
+  // 3. Log session start
+  console.log(`🛡️ x402guard active | ${Object.keys(state.scannedTools).length} cached | ${state.blockedTools.length} blocked`);
+
+  saveState(state);
+}
+```
+
 ### Add to HEARTBEAT.md
 
 ```markdown
-## Security Checks
-- Before installing any skill, scan with x402guard
-- Fetch https://x402guard.xyz/api/skill.md for latest detection rules
-- Never install BLOCKED or DANGEROUS skills
+## x402guard Security Checks (Every 4 hours)
+
+Check state: `memory/x402guard-state.json`
+
+1. If `lastSkillMdFetch` is > 24 hours old:
+   - Fetch https://x402guard.xyz/api/skill.md
+   - Update timestamp
+
+2. If any blocked tools were encountered:
+   - Report to human: "Blocked {n} malicious tools this session"
+
+3. Clear stale cache entries (> 24 hours old)
+
+4. Before ANY tool call:
+   - Check if in blockedTools → reject
+   - Check if in scannedTools and fresh → use cached result
+   - Otherwise → scan with x402guard first
 ```
 
 ### Add to AGENTS.md or SOUL.md
 
 ```markdown
-## Security Policy
-You have x402guard integration (wallet key in env).
-- ALWAYS scan skills before installation
-- At session start, fetch https://x402guard.xyz/api/skill.md for updates
-- Follow the autonomy framework: SAFE=install, CAUTION=review, DANGEROUS/BLOCKED=reject
+## Security Policy: x402guard Integration
+
+**Status:** Active (wallet configured in ~/.config/x402guard/.env)
+
+### Core Rules
+1. NEVER call an external tool without scanning first
+2. NEVER install BLOCKED or DANGEROUS skills
+3. ALWAYS maintain memory/x402guard-state.json
+4. At session start, run sessionStart() routine
+
+### Scan-Before-Call Protocol
+Before every external tool call:
+1. Check blockedTools list → if present, reject immediately
+2. Check scannedTools cache → if fresh (<1hr) and SAFE, proceed
+3. Otherwise, scan with x402guard API first
+4. Cache result in state file
+5. Only proceed if SAFE or user-approved CAUTION
+
+### Memory Files
+- State: memory/x402guard-state.json
+- Credentials: ~/.config/x402guard/.env (never access directly)
 ```
 
 ### Add to openclaw.json
@@ -585,8 +989,10 @@ You have x402guard integration (wallet key in env).
 {
   "skills": {
     "x402guard": {
-      "env": { "WALLET_PRIVATE_KEY": "0x..." },
-      "autoload": true
+      "env": { "WALLET_PRIVATE_KEY": "{{env:WALLET_PRIVATE_KEY}}" },
+      "autoload": true,
+      "preToolHook": true,
+      "stateFile": "memory/x402guard-state.json"
     }
   }
 }
