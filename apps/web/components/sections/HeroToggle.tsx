@@ -16,7 +16,7 @@ const HUMAN_CONTENT = {
   stats: [
     { value: "286+", label: "Skills Scanned" },
     { value: "<2s", label: "Avg Scan Time" },
-    { value: "$0.05", label: "Starting Price" },
+    { value: "$0.01", label: "Starting Price" },
   ],
 };
 
@@ -24,8 +24,8 @@ const AGENT_CONTENT = {
   headline: "Security for AI Agents",
   subheadline: "Scan skills before execution — powered by x402 micropayments",
   promptInstruction:
-    "Read https://x402guard.com/api/skill.md and follow the instructions to scan a skill",
-  curlExample: `curl -X POST https://x402guard.com/api/audit/quick \\
+    "Read https://x402guard.xyz/api/skill.md and follow the instructions to scan a skill",
+  curlExample: `curl -X POST https://x402guard.xyz/api/audit/quick \\
   -H "Content-Type: application/json" \\
   -d '{"skill_url": "https://clawhub.com/skills/weather"}'`,
   steps: [
@@ -243,7 +243,7 @@ export function HeroToggle() {
                     <CodeBlock
                       code={AGENT_CONTENT.curlExample}
                       language="bash"
-                      title="Quick Scan ($0.05 USDC)"
+                      title="Quick Scan ($0.01 USDC)"
                     />
                   </motion.div>
                 )}
