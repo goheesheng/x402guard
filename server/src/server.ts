@@ -5,6 +5,7 @@ import healthRouter from "./routes/health.js";
 import pricingRouter from "./routes/pricing.js";
 import auditRouter from "./routes/audit.js";
 import skillRouter from "./routes/skill.js";
+import discoveryRouter from "./routes/discovery.js";
 
 export function createServer(): Express {
   const app: Express = express();
@@ -56,12 +57,15 @@ export function createServer(): Express {
     next();
   });
   
+  // x402 Discovery endpoint (must be at root, not /api)
+  app.use(discoveryRouter);
+
   // Routes (all under /api prefix)
   app.use("/api", healthRouter);
   app.use("/api", pricingRouter);
   app.use("/api", skillRouter);
   app.use("/api", auditRouter);
-  
+
   // Error handler
   app.use(errorHandler);
   
