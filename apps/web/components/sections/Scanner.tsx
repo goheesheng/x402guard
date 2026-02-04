@@ -10,10 +10,12 @@ import {
   Wallet,
   PenLine,
   CreditCard,
+  ShieldCheck,
+  ExternalLink,
 } from "lucide-react";
-import { useAccount, useChainId, useSwitchChain } from "wagmi";
+import { useAccount, useSwitchChain } from "wagmi";
 import { base } from "wagmi/chains";
-import { Card, Button, Input, Textarea, Badge, VulnerabilityDisplay } from "@/components/ui";
+import { Card, Button, Input, Textarea, Badge, VulnerabilityDisplay, NetworkSwitchModal } from "@/components/ui";
 import { WalletConnect } from "@/components/ui/WalletConnect";
 import { TIERS } from "@/lib/constants";
 import { runAudit, getRiskColor, getRiskLevelColor, getRecommendationColor } from "@/lib/api";
@@ -42,12 +44,11 @@ export function Scanner() {
   const [error, setError] = useState<string | null>(null);
   const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null);
 
-  const { isConnected } = useAccount();
-  const chainId = useChainId();
+  const { isConnected, chain } = useAccount();
   const { switchChain } = useSwitchChain();
   const { fetchWithPayment, isReady } = useX402Payment();
 
-  const isWrongNetwork = isConnected && chainId !== base.id;
+  const isWrongNetwork = isConnected && chain?.id !== base.id;
 
   const handleScan = async () => {
     if (!isConnected) {
@@ -184,36 +185,8 @@ export function Scanner() {
           </motion.p>
         </motion.div>
 
-        {/* Wrong Network Warning */}
-        {isWrongNetwork && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
-          >
-            <Card className="p-6 border-yellow-500/30 bg-yellow-500/5">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center">
-                    <AlertCircle className="w-6 h-6 text-yellow-400" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-white">Wrong Network</h3>
-                    <p className="text-dark-400 text-sm">
-                      Please switch to Base network to make payments
-                    </p>
-                  </div>
-                </div>
-                <Button
-                  variant="secondary"
-                  onClick={() => switchChain({ chainId: base.id })}
-                >
-                  Switch to Base
-                </Button>
-              </div>
-            </Card>
-          </motion.div>
-        )}
+        {/* Network Switch Modal */}
+        <NetworkSwitchModal isOpen={isWrongNetwork} />
 
         {/* Wallet Connection Banner */}
         {!isConnected && (
@@ -446,15 +419,61 @@ export function Scanner() {
                     />
                   )}
 
-                  {/* Attestation */}
+                  {/* EIP-712 Attestation */}
                   {result.attestation && (
                     <div className="p-4 bg-primary-500/10 border border-primary-500/30 rounded-xl">
-                      <p className="text-dark-400 text-sm mb-1">Attestation</p>
-                      <p className="font-mono text-sm text-primary-400 break-all">
-                        {typeof result.attestation === "string"
-                          ? result.attestation
-                          : JSON.stringify(result.attestation)}
-                      </p>
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <ShieldCheck className="w-5 h-5 text-primary-400" />
+                          <span className="text-white font-semibold">Cryptographic Attestation</span>
+                        </div>
+                        {result.attestation.signature && (
+                          <Badge variant="success" className="flex items-center gap-1">
+                            <CheckCircle className="w-3 h-3" />
+                            EIP-712 Signed
+                          </Badge>
+                        )}
+                        {!result.attestation.signature && result.attestation.warning && (
+                          <Badge variant="warning">Unsigned</Badge>
+                        )}
+                      </div>
+
+                      {result.attestation.signature ? (
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 text-sm">
+                            <span className="text-dark-400">Signer:</span>
+                            <a
+                              href={`https://basescan.org/address/${result.attestation.signer}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-mono text-primary-400 hover:underline flex items-center gap-1"
+                            >
+                              {result.attestation.signer?.slice(0, 6)}...{result.attestation.signer?.slice(-4)}
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm">
+                            <span className="text-dark-400">Domain:</span>
+                            <span className="text-dark-300">
+                              {result.attestation.domain.name} v{result.attestation.domain.version} (Chain: {result.attestation.domain.chainId})
+                            </span>
+                          </div>
+                          <div className="text-sm">
+                            <span className="text-dark-400 block mb-1">Signature:</span>
+                            <p className="font-mono text-xs text-dark-300 break-all bg-dark-800 p-2 rounded">
+                              {result.attestation.signature}
+                            </p>
+                          </div>
+                          <p className="text-dark-500 text-xs">
+                            This attestation is cryptographically signed using EIP-712 typed data.
+                            Anyone can verify the signature matches the signer address on-chain.
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="text-sm text-dark-400">
+                          {result.attestation.warning || "Attestation signing not available"}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

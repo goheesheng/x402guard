@@ -19,3 +19,5 @@ export type { AccordionItem, AccordionProps } from "./Accordion";
 export { WalletConnect } from "./WalletConnect";
 
 export { VulnerabilityDisplay } from "./VulnerabilityDisplay";
+
+export { NetworkSwitchModal } from "./NetworkSwitchModal";

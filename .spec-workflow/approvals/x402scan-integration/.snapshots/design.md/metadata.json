@@ -1,0 +1,22 @@
+{
+  "filePath": ".spec-workflow/specs/x402scan-integration/design.md",
+  "currentVersion": 2,
+  "snapshots": [
+    {
+      "version": 1,
+      "filename": "snapshot-001.json",
+      "timestamp": "2026-02-02T11:28:20.675Z",
+      "trigger": "initial",
+      "approvalId": "approval_1770031700673_gl5gkuaqb",
+      "approvalTitle": "Design: x402scan Integration"
+    },
+    {
+      "version": 2,
+      "filename": "snapshot-002.json",
+      "timestamp": "2026-02-02T11:28:55.290Z",
+      "trigger": "approved",
+      "approvalId": "approval_1770031700673_gl5gkuaqb",
+      "approvalTitle": "Design: x402scan Integration"
+    }
+  ]
+}

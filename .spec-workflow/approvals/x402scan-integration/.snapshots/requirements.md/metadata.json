@@ -1,0 +1,30 @@
+{
+  "filePath": ".spec-workflow/specs/x402scan-integration/requirements.md",
+  "currentVersion": 3,
+  "snapshots": [
+    {
+      "version": 1,
+      "filename": "snapshot-001.json",
+      "timestamp": "2026-02-02T10:59:28.143Z",
+      "trigger": "initial",
+      "approvalId": "approval_1770029968138_gm6jhopsw",
+      "approvalTitle": "Requirements: x402scan Integration"
+    },
+    {
+      "version": 2,
+      "filename": "snapshot-002.json",
+      "timestamp": "2026-02-02T11:24:03.843Z",
+      "trigger": "revision_requested",
+      "approvalId": "approval_1770029968138_gm6jhopsw",
+      "approvalTitle": "Requirements: x402scan Integration"
+    },
+    {
+      "version": 3,
+      "filename": "snapshot-003.json",
+      "timestamp": "2026-02-02T11:26:17.009Z",
+      "trigger": "approved",
+      "approvalId": "approval_1770031501866_zpo8lxdzu",
+      "approvalTitle": "Requirements: x402scan Integration (Revised)"
+    }
+  ]
+}

@@ -6,6 +6,7 @@ import { AppError } from "../middleware/errorHandler.js";
 import { auditSkill } from "../services/auditEngine/index.js";
 import { config } from "../config/index.js";
 import { createX402Middleware, getPricingInfo } from "../middleware/x402.js";
+import { signAttestation } from "../utils/attestation.js";
 import type { AuditResponse, AuditTier } from "../types/api.js";
 
 const router: RouterType = Router();
@@ -79,13 +80,14 @@ async function runAuditHandler(req: any, res: any, next: any, tier: AuditTier) {
       tier,
     };
 
-    // Add attestation for deep tier
+    // Add EIP-712 signed attestation for deep tier
     if (tier === "deep") {
-      response.attestation = {
-        signature: `0x${Buffer.from(JSON.stringify({ audit_id: response.audit_id, risk_score: response.risk_score })).toString('hex').slice(0, 128)}`,
-        signer: config.X402_PAY_TO_ADDRESS,
-        chain: config.X402_NETWORK,
-      };
+      const skillUrl = skill_url || "inline-content";
+      response.attestation = await signAttestation(
+        response,
+        skillUrl,
+        config.ATTESTATION_PRIVATE_KEY
+      );
     }
 
     // Send response

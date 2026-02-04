@@ -25,7 +25,7 @@ app.use((req: any, res: any, next: any) => {
 });
 
 // Config - MAINNET DEFAULTS
-const PAY_TO = process.env.X402_PAY_TO_ADDRESS || "0xdc7f6ebefe62a402e7c75dd0b6d20ed7c4cb326a";
+const PAY_TO = process.env.X402_PAY_TO_ADDRESS || "0x93A0baf7295d99b143cFDc480f4Cc879Cbe1B52c";
 const NETWORK = "eip155:8453"; // Base Mainnet - ALWAYS mainnet
 const CDP_API_KEY_ID = process.env.CDP_API_KEY_ID;
 const CDP_API_KEY_SECRET = process.env.CDP_API_KEY_SECRET;

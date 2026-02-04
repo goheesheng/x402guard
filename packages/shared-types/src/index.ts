@@ -76,14 +76,39 @@ export interface AuditFindings {
   permissions: Permission[];
 }
 
-/** On-chain attestation for audit result */
+/** EIP-712 attestation message */
+export interface AttestationMessage {
+  /** Audit ID being attested */
+  audit_id: string;
+  /** URL of the skill that was audited */
+  skill_url: string;
+  /** Risk score from the audit */
+  risk_score: number;
+  /** Risk level classification */
+  risk_level: string;
+  /** Unix timestamp of attestation */
+  timestamp: number;
+}
+
+/** EIP-712 signed attestation for audit result */
 export interface AuditAttestation {
-  /** Cryptographic signature */
-  signature: string;
-  /** Signer address */
-  signer: string;
-  /** Blockchain network */
-  chain: string;
+  /** The attested message data */
+  message: AttestationMessage;
+  /** EIP-712 signature (null if signing not configured) */
+  signature: string | null;
+  /** Signer address (null if unsigned) */
+  signer: string | null;
+  /** EIP-712 domain parameters */
+  domain: {
+    /** Domain name (x402guard) */
+    name: string;
+    /** Domain version */
+    version: string;
+    /** Chain ID (8453 for Base) */
+    chainId: number;
+  };
+  /** Warning message if signing failed or not configured */
+  warning?: string;
 }
 
 /** Complete audit result */

@@ -34,7 +34,7 @@ Pre-install security auditing for AI agent skills powered by x402.
 
 - **Network**: Base Mainnet (eip155:8453)
 - **Asset**: USDC (0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913)
-- **PayTo**: 0xdc7f6ebefe62a402e7c75dd0b6d20ed7c4cb326a
+- **PayTo**: 0x93A0baf7295d99b143cFDc480f4Cc879Cbe1B52c
 
 ## Usage
 

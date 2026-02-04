@@ -8,8 +8,10 @@
 import { paymentMiddleware } from "@x402/express";
 import { x402ResourceServer, HTTPFacilitatorClient } from "@x402/core/server";
 import { registerExactEvmScheme } from "@x402/evm/exact/server";
+import { bazaarResourceServerExtension } from "@x402/extensions";
 import { createFacilitatorConfig } from "@coinbase/x402";
 import { config } from "../config/index.js";
+import { auditBazaarExtensions } from "../schemas/bazaar-extensions.js";
 
 // Pricing in USDC atomic units (6 decimals)
 // $0.01 = 10000, $0.05 = 50000, $0.10 = 100000
@@ -34,6 +36,9 @@ const facilitatorClient = new HTTPFacilitatorClient(facilitatorConfig);
 const x402Server = new x402ResourceServer(facilitatorClient);
 registerExactEvmScheme(x402Server);
 
+// Register Bazaar extension for x402scan discovery compatibility
+x402Server.registerExtension(bazaarResourceServerExtension);
+
 /**
  * Express middleware factory for x402-protected routes
  * Uses the standard @x402/express middleware
@@ -55,6 +60,7 @@ export function createX402Middleware(): any {
         ],
         description: "Quick YARA malware scan",
         mimeType: "application/json",
+        extensions: auditBazaarExtensions.quick,
       },
       "POST /audit/standard": {
         accepts: [
@@ -67,6 +73,7 @@ export function createX402Middleware(): any {
         ],
         description: "Standard security analysis with permissions and network detection",
         mimeType: "application/json",
+        extensions: auditBazaarExtensions.standard,
       },
       "POST /audit/deep": {
         accepts: [
@@ -79,6 +86,7 @@ export function createX402Middleware(): any {
         ],
         description: "Deep comprehensive security audit with behavioral sandbox",
         mimeType: "application/json",
+        extensions: auditBazaarExtensions.deep,
       },
       "POST /audit": {
         accepts: [
@@ -91,6 +99,7 @@ export function createX402Middleware(): any {
         ],
         description: "Security audit (default: quick tier)",
         mimeType: "application/json",
+        extensions: auditBazaarExtensions.quick,
       },
     },
     x402Server,

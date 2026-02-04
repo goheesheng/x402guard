@@ -9,7 +9,7 @@
 | Setting | Value |
 |---------|-------|
 | API URL | http://localhost:3000 (local testing) |
-| Payment Address | 0xdc7f6ebefe62a402e7c75dd0b6d20ed7c4cb326a |
+| Payment Address | 0x93A0baf7295d99b143cFDc480f4Cc879Cbe1B52c |
 | Facilitator | Coinbase CDP (https://api.cdp.coinbase.com/platform/v2/x402) |
 | Network | Base Mainnet (eip155:8453) |
 
@@ -79,7 +79,7 @@
 - **Settlement:** Base Mainnet USDC
 
 ### Wallet Addresses
-- **Payment recipient:** [0xdc7f6ebefe62a402e7c75dd0b6d20ed7c4cb326a](https://basescan.org/address/0xdc7f6ebefe62a402e7c75dd0b6d20ed7c4cb326a)
+- **Payment recipient:** [0x93A0baf7295d99b143cFDc480f4Cc879Cbe1B52c](https://basescan.org/address/0x93A0baf7295d99b143cFDc480f4Cc879Cbe1B52c)
 - **Test client:** [0x895498CCe10d832365B07F26998Fe504c3e8Ef78](https://basescan.org/address/0x895498CCe10d832365B07F26998Fe504c3e8Ef78)
 
 ## Files Modified

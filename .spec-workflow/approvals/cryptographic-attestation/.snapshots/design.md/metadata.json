@@ -1,0 +1,22 @@
+{
+  "filePath": ".spec-workflow/specs/cryptographic-attestation/design.md",
+  "currentVersion": 2,
+  "snapshots": [
+    {
+      "version": 1,
+      "filename": "snapshot-001.json",
+      "timestamp": "2026-02-03T15:28:13.556Z",
+      "trigger": "initial",
+      "approvalId": "approval_1770132493551_m72hk2zgq",
+      "approvalTitle": "Design: Cryptographic Attestation"
+    },
+    {
+      "version": 2,
+      "filename": "snapshot-002.json",
+      "timestamp": "2026-02-03T15:31:51.359Z",
+      "trigger": "approved",
+      "approvalId": "approval_1770132493551_m72hk2zgq",
+      "approvalTitle": "Design: Cryptographic Attestation"
+    }
+  ]
+}

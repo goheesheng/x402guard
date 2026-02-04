@@ -52,6 +52,35 @@ export interface RiskBreakdown {
   permissions: number;
 }
 
+// EIP-712 Attestation Types
+export interface AttestationMessage {
+  audit_id: string;
+  skill_url: string;
+  risk_score: number;
+  risk_level: string;
+  timestamp: number;
+}
+
+export interface Attestation {
+  message: AttestationMessage;
+  signature: string | null;
+  signer: string | null;
+  domain: {
+    name: string;
+    version: string;
+    chainId: number;
+  };
+  warning?: string;
+}
+
+export interface VerificationResult {
+  valid: boolean;
+  signer: string | null;
+  expectedSigner: string | null;
+  matches: boolean;
+  error?: string;
+}
+
 export interface AuditResponse {
   risk_score: number;
   risk_level: RiskLevel;
@@ -60,11 +89,7 @@ export interface AuditResponse {
   audit_id: string;
   timestamp: string;
   tier: AuditTier;
-  attestation?: {
-    signature: string;
-    signer: string;
-    chain: string;
-  };
+  attestation?: Attestation;
 }
 
 export interface HealthResponse {

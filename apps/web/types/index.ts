@@ -55,10 +55,25 @@ export interface AuditFindings {
 export type RiskLevel = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 export type Recommendation = "SAFE" | "CAUTION" | "DANGEROUS" | "BLOCKED";
 
+// EIP-712 Attestation types
+export interface AttestationMessage {
+  audit_id: string;
+  skill_url: string;
+  risk_score: number;
+  risk_level: string;
+  timestamp: number;
+}
+
 export interface AuditAttestation {
-  signature: string;
-  signer: string;
-  chain: string;
+  message: AttestationMessage;
+  signature: string | null;
+  signer: string | null;
+  domain: {
+    name: string;
+    version: string;
+    chainId: number;
+  };
+  warning?: string;
 }
 
 export interface AuditResult {

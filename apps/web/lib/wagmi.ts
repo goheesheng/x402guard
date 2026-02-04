@@ -1,15 +1,20 @@
 import { http, createConfig, createStorage, cookieStorage } from "wagmi";
-import { base } from "wagmi/chains";
+import { base, mainnet, polygon, arbitrum, optimism } from "wagmi/chains";
 
 // x402guard uses Base Mainnet for USDC payments
+// Include other common chains so wagmi can detect when wallet is on wrong network
 export const config = createConfig({
-  chains: [base],
+  chains: [base, mainnet, polygon, arbitrum, optimism],
   ssr: true,
   storage: createStorage({
     storage: cookieStorage,
   }),
   transports: {
     [base.id]: http(),
+    [mainnet.id]: http(),
+    [polygon.id]: http(),
+    [arbitrum.id]: http(),
+    [optimism.id]: http(),
   },
 });
 

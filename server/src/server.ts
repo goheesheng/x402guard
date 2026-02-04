@@ -6,6 +6,7 @@ import pricingRouter from "./routes/pricing.js";
 import auditRouter from "./routes/audit.js";
 import skillRouter from "./routes/skill.js";
 import discoveryRouter from "./routes/discovery.js";
+import verifyRouter from "./routes/verify.js";
 
 export function createServer(): Express {
   const app: Express = express();
@@ -65,6 +66,7 @@ export function createServer(): Express {
   app.use("/api", pricingRouter);
   app.use("/api", skillRouter);
   app.use("/api", auditRouter);
+  app.use("/api", verifyRouter);
 
   // Error handler
   app.use(errorHandler);
