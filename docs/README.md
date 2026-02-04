@@ -27,6 +27,7 @@
 ## Reference
 
 - [API Reference](./API_REFERENCE.md) - HTTP API documentation
+- [EIP-712 Attestation](./EIP712_ATTESTATION.md) - Cryptographic attestation signing
 - [Detection Rules](./DETECTION_RULES.md) - YARA-style pattern matching (10 rules, 40+ patterns)
 - [Risk Scoring](./RISK_SCORING.md) - How scores are calculated
 - [Self-Hosting](./SELF_HOSTING.md) - Run your own x402guard server
@@ -134,7 +135,8 @@ if (result.recommendation === 'SAFE') {
 | `/pricing` | GET | Free | Pricing info |
 | `/audit/quick` | POST | $0.01 | YARA malware scan |
 | `/audit/standard` | POST | $0.05 | + Permissions + Network |
-| `/audit/deep` | POST | $0.10 | + Sandbox + Attestation |
+| `/audit/deep` | POST | $0.10 | + Sandbox + EIP-712 Attestation |
+| `/verify` | POST | Free | Verify EIP-712 attestations |
 
 ## Detection Rules
 

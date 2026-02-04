@@ -240,7 +240,7 @@ POST /api/audit/deep
 
 **Price:** $0.10 USDC
 
-Complete audit with behavioral sandbox analysis and signed attestation.
+Complete audit with behavioral sandbox analysis and EIP-712 signed attestation.
 
 **Response includes:**
 ```json
@@ -253,11 +253,77 @@ Complete audit with behavioral sandbox analysis and signed attestation.
   "timestamp": "2026-01-31T10:30:00Z",
   "tier": "deep",
   "attestation": {
-    "signature": "0x...",
-    "signer": "0x...",
-    "chain": "base"
+    "message": {
+      "audit_id": "aud_abc123",
+      "skill_url": "https://example.com/skill.md",
+      "risk_score": 12,
+      "risk_level": "LOW",
+      "timestamp": 1707024000
+    },
+    "signature": "0xfdff0aba...",
+    "signer": "0x12FCed65536f4F19757b56d276172c177Bf53C01",
+    "domain": {
+      "name": "x402guard",
+      "version": "1",
+      "chainId": 8453
+    }
   }
 }
+```
+
+---
+
+### Verify Attestation
+
+```
+POST /api/verify
+```
+
+**Price:** Free
+
+Verify an EIP-712 signed attestation from a deep scan.
+
+**Request:**
+```json
+{
+  "message": {
+    "audit_id": "aud_abc123",
+    "skill_url": "https://example.com/skill.md",
+    "risk_score": 12,
+    "risk_level": "LOW",
+    "timestamp": 1707024000
+  },
+  "signature": "0xfdff0aba...",
+  "signer": "0x12FCed65536f4F19757b56d276172c177Bf53C01",
+  "domain": {
+    "name": "x402guard",
+    "version": "1",
+    "chainId": 8453
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "verification": {
+    "valid": true,
+    "signer": "0x12FCed65536f4F19757b56d276172c177Bf53C01",
+    "expectedSigner": null,
+    "matches": true
+  },
+  "attestation": {
+    "audit_id": "aud_abc123",
+    "skill_url": "https://example.com/skill.md",
+    "risk_score": 12,
+    "risk_level": "LOW",
+    "timestamp": 1707024000
+  }
+}
+```
+
+**Query Parameters:**
+- `expected_signer` (optional): Address to verify the signature against
 ```
 
 ---
