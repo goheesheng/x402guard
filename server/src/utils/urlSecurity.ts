@@ -143,9 +143,82 @@ export async function assertSafeOutboundUrl(rawUrl: string): Promise<URL> {
   return parsedUrl;
 }
 
-export function getSecureFetchOptions(userAgent: string): RequestInit {
+export function getSecureFetchOptions(
+  userAgent: string,
+  signal?: AbortSignal
+): RequestInit {
   return {
     headers: { "User-Agent": userAgent },
     redirect: "error",
+    signal,
   };
+}
+
+interface TimedFetchOptions {
+  userAgent: string;
+  timeoutMs: number;
+}
+
+export async function fetchWithTimeout(
+  url: string,
+  options: TimedFetchOptions
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutMs = Math.max(1, options.timeoutMs);
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(
+      url,
+      getSecureFetchOptions(options.userAgent, controller.signal)
+    );
+  } catch (error) {
+    if ((error as Error).name === "AbortError") {
+      throw new Error(`Request timed out after ${timeoutMs}ms`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+export async function readResponseTextWithLimit(
+  response: Response,
+  maxBytes: number
+): Promise<string> {
+  const limit = Math.max(1, maxBytes);
+  const stream = response.body as any;
+  const reader = stream?.getReader?.();
+
+  if (!reader) {
+    const text = await response.text();
+    if (Buffer.byteLength(text, "utf8") > limit) {
+      throw new Error("Skill content exceeds maximum size");
+    }
+    return text;
+  }
+
+  const decoder = new TextDecoder();
+  let totalBytes = 0;
+  let text = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    totalBytes += value.byteLength;
+    if (totalBytes > limit) {
+      try {
+        await reader.cancel();
+      } catch {
+        // noop
+      }
+      throw new Error("Skill content exceeds maximum size");
+    }
+
+    text += decoder.decode(value, { stream: true });
+  }
+
+  text += decoder.decode();
+  return text;
 }

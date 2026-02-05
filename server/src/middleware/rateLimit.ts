@@ -11,16 +11,9 @@ interface RateLimitBucket {
 }
 
 function getClientIp(req: any): string {
-  const forwardedFor = req.headers?.["x-forwarded-for"];
-  if (typeof forwardedFor === "string" && forwardedFor.trim().length > 0) {
-    return forwardedFor.split(",")[0].trim();
-  }
-
-  if (Array.isArray(forwardedFor) && forwardedFor.length > 0) {
-    return String(forwardedFor[0]).trim();
-  }
-
-  return req.ip || req.socket?.remoteAddress || "unknown";
+  // Never trust x-forwarded-for directly from request headers.
+  // req.ip respects Express trust proxy settings and is safe by default.
+  return req.ip || req.socket?.remoteAddress || req.connection?.remoteAddress || "unknown";
 }
 
 export function createRateLimitMiddleware(options: RateLimitOptions): any {

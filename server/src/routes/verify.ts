@@ -2,6 +2,7 @@ import { Router } from "express";
 import type { Router as RouterType } from "express";
 import { z } from "zod";
 import { AppError } from "../middleware/errorHandler.js";
+import { config } from "../config/index.js";
 import { verifyAttestation, type Attestation } from "../utils/attestation.js";
 
 const router: RouterType = Router();
@@ -40,14 +41,23 @@ router.post("/verify", async (req: any, res: any, next: any) => {
 
     const attestation = parseResult.data as Attestation;
 
-    // Optional: expected signer from query param
-    const expectedSigner = req.query.expected_signer as string | undefined;
+    // Enforce a trusted signer baseline to avoid caller-controlled trust decisions.
+    const trustedSigner =
+      config.ATTESTATION_TRUSTED_SIGNER || config.X402_PAY_TO_ADDRESS;
+    const requestedSigner = req.query.expected_signer as string | undefined;
 
     // Verify the attestation
-    const result = await verifyAttestation(attestation, expectedSigner);
+    const result = await verifyAttestation(attestation, trustedSigner);
+
+    const requestedSignerMatch = requestedSigner
+      ? attestation.signer?.toLowerCase() === requestedSigner.toLowerCase()
+      : null;
 
     res.json({
       verification: result,
+      trusted_signer: trustedSigner,
+      requested_signer: requestedSigner || null,
+      requested_signer_match: requestedSignerMatch,
       attestation: {
         audit_id: attestation.message.audit_id,
         skill_url: attestation.message.skill_url,
@@ -70,7 +80,7 @@ router.get("/verify", (_req: any, res: any) => {
     request: {
       body: "Attestation object from deep scan response",
       query: {
-        expected_signer: "(optional) Address to verify against",
+        expected_signer: "(optional) Additional signer to compare (baseline trust signer is always enforced)",
       },
     },
     response: {

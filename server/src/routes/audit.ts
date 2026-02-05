@@ -7,7 +7,11 @@ import { auditSkill } from "../services/auditEngine/index.js";
 import { config } from "../config/index.js";
 import { createX402Middleware, getPricingInfo } from "../middleware/x402.js";
 import { signAttestation } from "../utils/attestation.js";
-import { assertSafeOutboundUrl, getSecureFetchOptions } from "../utils/urlSecurity.js";
+import {
+  assertSafeOutboundUrl,
+  fetchWithTimeout,
+  readResponseTextWithLimit,
+} from "../utils/urlSecurity.js";
 import type { AuditResponse, AuditTier } from "../types/api.js";
 
 const router: RouterType = Router();
@@ -37,9 +41,9 @@ async function fetchSkillContent(url: string): Promise<string> {
 
   let fetchResult: any;
   try {
-    fetchResult = await fetch(
+    fetchResult = await fetchWithTimeout(
       safeUrl.toString(),
-      getSecureFetchOptions("x402guard/0.1")
+      { userAgent: "x402guard/0.1", timeoutMs: config.FETCH_TIMEOUT_MS }
     );
   } catch (error) {
     throw new AppError(
@@ -53,10 +57,15 @@ async function fetchSkillContent(url: string): Promise<string> {
     throw new AppError(`Failed to fetch skill: ${fetchResult.status}`, "FETCH_ERROR", 400);
   }
 
-  const content = await fetchResult.text();
-
-  if (content.length > config.MAX_SKILL_SIZE) {
-    throw new AppError("Skill content exceeds maximum size", "SKILL_TOO_LARGE", 413);
+  let content: string;
+  try {
+    content = await readResponseTextWithLimit(fetchResult, config.MAX_SKILL_SIZE);
+  } catch (error) {
+    throw new AppError(
+      (error as Error).message,
+      "SKILL_TOO_LARGE",
+      413
+    );
   }
 
   return content;
@@ -137,6 +146,10 @@ router.use(createX402Middleware());
 
 // GET /audit - Return pricing info (free)
 router.get("/audit", (_req: any, res: any) => {
+  const deepTierDescription = config.ATTESTATION_PRIVATE_KEY
+    ? "$0.10 - Complete audit + behavioral sandbox"
+    : "Unavailable - ATTESTATION_PRIVATE_KEY is not configured";
+
   res.json({
     message: "x402guard Audit API",
     method: "POST",
@@ -145,7 +158,7 @@ router.get("/audit", (_req: any, res: any) => {
     endpoints: {
       "/audit/quick": "$0.01 - Pattern malware scan (YARA-style rules)",
       "/audit/standard": "$0.05 - Full analysis + permissions + network",
-      "/audit/deep": "$0.10 - Complete audit + behavioral sandbox",
+      "/audit/deep": deepTierDescription,
     },
   });
 });

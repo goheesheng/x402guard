@@ -112,9 +112,9 @@ export const SKILL_METADATA: SkillMetadata = {
     asset_name: "USDC",
     decimals: 6,
     tiers: {
-      quick: "0.05",
-      standard: "0.15",
-      deep: "0.50",
+      quick: "0.01",
+      standard: "0.05",
+      deep: "0.10",
     },
   },
   documentation: {

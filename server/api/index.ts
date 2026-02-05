@@ -52,12 +52,12 @@ app.use(
         accepts: [
           {
             scheme: "exact",
-            price: "$0.05",
+            price: "$0.01",
             network: NETWORK,
             payTo: PAY_TO,
           },
         ],
-        description: "Quick YARA malware scan",
+        description: "Quick pattern malware scan (YARA-style rules)",
         mimeType: "application/json",
       },
       "POST /api/audit/standard": {

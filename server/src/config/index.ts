@@ -38,6 +38,8 @@ const envSchema = z.object({
   // Attestation Signing (optional - for cryptographically signed deep scan attestations)
   // Private key for EIP-712 attestation signing (0x-prefixed hex string)
   ATTESTATION_PRIVATE_KEY: z.string().optional(),
+  // Optional trusted signer address used by /verify (defaults to X402_PAY_TO_ADDRESS)
+  ATTESTATION_TRUSTED_SIGNER: z.string().optional(),
 
   // Pricing (USDC atomic units, 6 decimals)
   // $0.01 = 10000, $0.05 = 50000, $0.10 = 100000
@@ -47,6 +49,7 @@ const envSchema = z.object({
 
   // Limits
   MAX_SKILL_SIZE: z.string().default("1048576").transform(Number),
+  FETCH_TIMEOUT_MS: z.string().default("10000").transform(Number),
   RATE_LIMIT_WINDOW: z.string().default("60000").transform(Number),
   RATE_LIMIT_MAX: z.string().default("100").transform(Number),
   CORS_ALLOWED_ORIGINS: z

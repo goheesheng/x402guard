@@ -46,64 +46,66 @@ x402Server.registerExtension(bazaarResourceServerExtension);
 export function createX402Middleware(): any {
   const PAY_TO = config.X402_PAY_TO_ADDRESS;
   const NETWORK = config.X402_NETWORK as `${string}:${string}`;
-
-  return paymentMiddleware(
-    {
-      "POST /audit/quick": {
-        accepts: [
-          {
-            scheme: "exact",
-            price: "$0.01",
-            network: NETWORK,
-            payTo: PAY_TO,
-          },
-        ],
-        description: "Quick pattern malware scan (YARA-style rules)",
-        mimeType: "application/json",
-        extensions: auditBazaarExtensions.quick,
-      },
-      "POST /audit/standard": {
-        accepts: [
-          {
-            scheme: "exact",
-            price: "$0.05",
-            network: NETWORK,
-            payTo: PAY_TO,
-          },
-        ],
-        description: "Standard security analysis with pattern, permissions, and network detection",
-        mimeType: "application/json",
-        extensions: auditBazaarExtensions.standard,
-      },
-      "POST /audit/deep": {
-        accepts: [
-          {
-            scheme: "exact",
-            price: "$0.10",
-            network: NETWORK,
-            payTo: PAY_TO,
-          },
-        ],
-        description: "Deep comprehensive security audit with behavioral sandbox",
-        mimeType: "application/json",
-        extensions: auditBazaarExtensions.deep,
-      },
-      "POST /audit": {
-        accepts: [
-          {
-            scheme: "exact",
-            price: "$0.01",
-            network: NETWORK,
-            payTo: PAY_TO,
-          },
-        ],
-        description: "Security audit (default: quick tier)",
-        mimeType: "application/json",
-        extensions: auditBazaarExtensions.quick,
-      },
+  const protectedRoutes: Record<string, any> = {
+    "POST /audit/quick": {
+      accepts: [
+        {
+          scheme: "exact",
+          price: "$0.01",
+          network: NETWORK,
+          payTo: PAY_TO,
+        },
+      ],
+      description: "Quick pattern malware scan (YARA-style rules)",
+      mimeType: "application/json",
+      extensions: auditBazaarExtensions.quick,
     },
-    x402Server,
-  );
+    "POST /audit/standard": {
+      accepts: [
+        {
+          scheme: "exact",
+          price: "$0.05",
+          network: NETWORK,
+          payTo: PAY_TO,
+        },
+      ],
+      description: "Standard security analysis with pattern, permissions, and network detection",
+      mimeType: "application/json",
+      extensions: auditBazaarExtensions.standard,
+    },
+    "POST /audit": {
+      accepts: [
+        {
+          scheme: "exact",
+          price: "$0.01",
+          network: NETWORK,
+          payTo: PAY_TO,
+        },
+      ],
+      description: "Security audit (default: quick tier)",
+      mimeType: "application/json",
+      extensions: auditBazaarExtensions.quick,
+    },
+  };
+
+  // Never collect payment for deep tier when signing is unavailable.
+  if (config.ATTESTATION_PRIVATE_KEY) {
+    protectedRoutes["POST /audit/deep"] = {
+      accepts: [
+        {
+          scheme: "exact",
+          price: "$0.10",
+          network: NETWORK,
+          payTo: PAY_TO,
+        },
+      ],
+      description: "Deep comprehensive security audit with behavioral sandbox",
+      mimeType: "application/json",
+      extensions: auditBazaarExtensions.deep,
+    };
+  }
+
+  return paymentMiddleware(protectedRoutes, x402Server);
 }
 
 /**
@@ -123,8 +125,11 @@ export function getPricingInfo() {
     },
     deep: {
       price: "$0.10",
-      description: "Full analysis + detailed report",
+      description: config.ATTESTATION_PRIVATE_KEY
+        ? "Full analysis + detailed report"
+        : "Unavailable (missing ATTESTATION_PRIVATE_KEY)",
       features: ["All standard features", "Deep code analysis", "Risk scoring", "Remediation suggestions"],
+      available: Boolean(config.ATTESTATION_PRIVATE_KEY),
     },
   };
 }
