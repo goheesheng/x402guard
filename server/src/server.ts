@@ -10,9 +10,22 @@ import verifyRouter from "./routes/verify.js";
 import { config } from "./config/index.js";
 import { createCorsMiddleware } from "./middleware/cors.js";
 import { createRateLimitMiddleware } from "./middleware/rateLimit.js";
+import { createRateLimitStore } from "./middleware/rateLimitStore.js";
+
+function parseTrustProxy(value: string): boolean | number | string {
+  const normalized = value.trim().toLowerCase();
+  if (normalized === "true") return true;
+  if (normalized === "false") return false;
+  const numeric = Number(normalized);
+  if (!Number.isNaN(numeric)) return numeric;
+  return value;
+}
 
 export function createServer(): Express {
   const app: Express = express();
+
+  // Honor proxy headers when configured (required for correct client IPs behind proxies).
+  app.set("trust proxy", parseTrustProxy(config.TRUST_PROXY || "0"));
   
   // Middleware
   app.use(express.json({ limit: "2mb" }));
@@ -34,6 +47,11 @@ export function createServer(): Express {
     createRateLimitMiddleware({
       windowMs: config.RATE_LIMIT_WINDOW,
       max: config.RATE_LIMIT_MAX,
+      store: createRateLimitStore({
+        provider: config.RATE_LIMIT_STORE,
+        upstashUrl: config.UPSTASH_REDIS_REST_URL,
+        upstashToken: config.UPSTASH_REDIS_REST_TOKEN,
+      }),
     })
   );
 

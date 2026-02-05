@@ -23,7 +23,7 @@ const envSchema = z.object({
   X402_PAY_TO_ADDRESS: z.string().min(1),
   X402_FACILITATOR_URL: z.string().url().default("https://api.cdp.coinbase.com/platform/v2/x402"),
   // Force Base Mainnet - hardcoded to ensure mainnet payments
-  X402_NETWORK: z.string().transform(() => "eip155:8453"),
+  X402_NETWORK: z.string().default("eip155:8453").transform(() => "eip155:8453"),
 
   // Coinbase CDP API Credentials (for x402 facilitator authentication)
   CDP_API_KEY_ID: z.string().optional(),
@@ -52,10 +52,14 @@ const envSchema = z.object({
   FETCH_TIMEOUT_MS: z.string().default("10000").transform(Number),
   RATE_LIMIT_WINDOW: z.string().default("60000").transform(Number),
   RATE_LIMIT_MAX: z.string().default("100").transform(Number),
+  RATE_LIMIT_STORE: z.enum(["memory", "upstash"]).default("memory"),
+  UPSTASH_REDIS_REST_URL: z.string().url().optional(),
+  UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
   CORS_ALLOWED_ORIGINS: z
     .string()
     .default("http://localhost:3000,http://127.0.0.1:3000")
     .transform(parseCsvList),
+  TRUST_PROXY: z.string().optional(),
 });
 
 function loadConfig() {
@@ -79,6 +83,18 @@ function loadConfig() {
     } catch {
       // Ignore malformed BASE_URL here since schema validation already handles it.
     }
+  }
+
+  if (data.RATE_LIMIT_STORE === "upstash") {
+    if (!data.UPSTASH_REDIS_REST_URL || !data.UPSTASH_REDIS_REST_TOKEN) {
+      throw new Error(
+        "UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN are required when RATE_LIMIT_STORE=upstash"
+      );
+    }
+  }
+
+  if (!data.TRUST_PROXY) {
+    data.TRUST_PROXY = data.NODE_ENV === "production" ? "1" : "0";
   }
 
   return data;

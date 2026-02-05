@@ -1,5 +1,7 @@
-import { lookup } from "dns/promises";
+import { lookup as dnsLookup } from "dns";
+import { lookup as lookupAsync } from "dns/promises";
 import { isIP } from "net";
+import { Agent, fetch as undiciFetch } from "undici";
 
 const BLOCKED_HOSTNAMES = new Set([
   "localhost",
@@ -95,6 +97,41 @@ export function isPublicIpAddress(address: string): boolean {
   return false;
 }
 
+const secureDispatcher = new Agent({
+  connect: {
+    lookup: (
+      hostname: string,
+      options: any,
+      callback: (err: NodeJS.ErrnoException | null, address: string, family: number) => void
+    ) => {
+      const normalizedOptions =
+        typeof options === "number" ? { family: options } : (options || {});
+
+      dnsLookup(
+        hostname,
+        { ...normalizedOptions, all: false, verbatim: true },
+        (err, address, family) => {
+          if (err) {
+            callback(err, address as any, family as any);
+            return;
+          }
+
+          if (!isPublicIpAddress(address)) {
+            callback(
+              new Error("URL resolves to a private or local network address"),
+              address,
+              family
+            );
+            return;
+          }
+
+          callback(null, address, family);
+        }
+      );
+    },
+  },
+});
+
 export async function assertSafeOutboundUrl(rawUrl: string): Promise<URL> {
   let parsedUrl: URL;
 
@@ -129,7 +166,7 @@ export async function assertSafeOutboundUrl(rawUrl: string): Promise<URL> {
     return parsedUrl;
   }
 
-  const records = await lookup(hostname, { all: true, verbatim: true });
+  const records = await lookupAsync(hostname, { all: true, verbatim: true });
   if (!records.length) {
     throw new Error("Unable to resolve URL hostname");
   }
@@ -168,10 +205,10 @@ export async function fetchWithTimeout(
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    return await fetch(
-      url,
-      getSecureFetchOptions(options.userAgent, controller.signal)
-    );
+    return await undiciFetch(url, {
+      ...getSecureFetchOptions(options.userAgent, controller.signal),
+      dispatcher: secureDispatcher,
+    });
   } catch (error) {
     if ((error as Error).name === "AbortError") {
       throw new Error(`Request timed out after ${timeoutMs}ms`);

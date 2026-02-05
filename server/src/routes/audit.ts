@@ -86,6 +86,14 @@ async function runAuditHandler(req: any, res: any, next: any, tier: AuditTier) {
 
     const { skill_url, skill_content } = parseResult.data;
 
+    if (tier === "deep" && !config.ATTESTATION_PRIVATE_KEY) {
+      throw new AppError(
+        "Deep audit requires ATTESTATION_PRIVATE_KEY for signed attestations",
+        "ATTESTATION_NOT_CONFIGURED",
+        503
+      );
+    }
+
     // Get skill content
     let content: string;
     if (skill_content) {
@@ -109,19 +117,11 @@ async function runAuditHandler(req: any, res: any, next: any, tier: AuditTier) {
 
     // Add EIP-712 signed attestation for deep tier
     if (tier === "deep") {
-      if (!config.ATTESTATION_PRIVATE_KEY) {
-        throw new AppError(
-          "Deep audit requires ATTESTATION_PRIVATE_KEY for signed attestations",
-          "ATTESTATION_NOT_CONFIGURED",
-          503
-        );
-      }
-
       const skillUrl = skill_url || "inline-content";
       response.attestation = await signAttestation(
         response,
         skillUrl,
-        config.ATTESTATION_PRIVATE_KEY
+        config.ATTESTATION_PRIVATE_KEY as string
       );
 
       if (!response.attestation.signature || !response.attestation.signer) {
