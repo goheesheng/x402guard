@@ -13,7 +13,7 @@ router.get("/pricing", (_req: any, res: any) => {
         price: `${config.PRICE_QUICK}`,
         priceUSD: config.PRICE_QUICK / 1_000_000,
         features: [
-          "YARA malware scanning",
+          "Pattern-based malware scanning (YARA-style rules)",
           "Basic risk score (0-100)",
           "Risk level classification",
           "Recommendation",

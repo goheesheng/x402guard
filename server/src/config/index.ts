@@ -4,6 +4,15 @@ import { config as dotenvConfig } from "dotenv";
 // Load .env file
 dotenvConfig();
 
+function parseCsvList(value: string): string[] {
+  return [...new Set(
+    value
+      .split(",")
+      .map((entry) => entry.trim())
+      .filter(Boolean)
+  )];
+}
+
 const envSchema = z.object({
   // Base URL for resources
   BASE_URL: z.string().url().default("http://localhost:3001"),
@@ -40,6 +49,10 @@ const envSchema = z.object({
   MAX_SKILL_SIZE: z.string().default("1048576").transform(Number),
   RATE_LIMIT_WINDOW: z.string().default("60000").transform(Number),
   RATE_LIMIT_MAX: z.string().default("100").transform(Number),
+  CORS_ALLOWED_ORIGINS: z
+    .string()
+    .default("http://localhost:3000,http://127.0.0.1:3000")
+    .transform(parseCsvList),
 });
 
 function loadConfig() {
@@ -51,7 +64,21 @@ function loadConfig() {
     throw new Error("Invalid configuration");
   }
   
-  return parsed.data;
+  const data = parsed.data;
+
+  // Always allow BASE_URL origin unless wildcard is explicitly used.
+  if (!data.CORS_ALLOWED_ORIGINS.includes("*")) {
+    try {
+      const baseOrigin = new URL(data.BASE_URL).origin;
+      if (!data.CORS_ALLOWED_ORIGINS.includes(baseOrigin)) {
+        data.CORS_ALLOWED_ORIGINS.push(baseOrigin);
+      }
+    } catch {
+      // Ignore malformed BASE_URL here since schema validation already handles it.
+    }
+  }
+
+  return data;
 }
 
 export const config = loadConfig();

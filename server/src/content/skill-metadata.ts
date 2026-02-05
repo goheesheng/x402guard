@@ -49,7 +49,7 @@ export interface SkillMetadata {
 export const SKILL_METADATA: SkillMetadata = {
   name: "x402guard",
   description:
-    "Pre-install security scanning for AI agent skills. YARA malware detection, permission analysis, and trust attestation.",
+    "Pre-install security scanning for AI agent skills. Pattern-based malware detection (YARA-style rules), permission analysis, and trust attestation.",
   version: "1.1.0",
   author: "x402guard",
   homepage: "https://x402guard.xyz",
@@ -69,7 +69,7 @@ export const SKILL_METADATA: SkillMetadata = {
     audit_quick: {
       method: "POST",
       path: "/api/audit/quick",
-      description: "Quick YARA malware scan ($0.01 USDC)",
+      description: "Quick pattern malware scan (YARA-style rules) ($0.01 USDC)",
       price_usdc: "0.01",
       requires_payment: true,
     },

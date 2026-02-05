@@ -58,7 +58,7 @@ export function createX402Middleware(): any {
             payTo: PAY_TO,
           },
         ],
-        description: "Quick YARA malware scan",
+        description: "Quick pattern malware scan (YARA-style rules)",
         mimeType: "application/json",
         extensions: auditBazaarExtensions.quick,
       },
@@ -71,7 +71,7 @@ export function createX402Middleware(): any {
             payTo: PAY_TO,
           },
         ],
-        description: "Standard security analysis with permissions and network detection",
+        description: "Standard security analysis with pattern, permissions, and network detection",
         mimeType: "application/json",
         extensions: auditBazaarExtensions.standard,
       },
@@ -113,12 +113,12 @@ export function getPricingInfo() {
   return {
     quick: {
       price: "$0.01",
-      description: "YARA scan only",
+      description: "Pattern scan only (YARA-style rules)",
       features: ["Malware signature detection", "Basic pattern matching"],
     },
     standard: {
       price: "$0.05",
-      description: "YARA + permissions + network analysis",
+      description: "Pattern scanning + permissions + network analysis",
       features: ["All quick features", "Permission analysis", "Network call detection", "Dependency scanning"],
     },
     deep: {

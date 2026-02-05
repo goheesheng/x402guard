@@ -70,7 +70,7 @@ export const auditOutputSchema = {
       properties: {
         malware: {
           type: "array",
-          description: "YARA rule matches for malware signatures",
+          description: "Pattern-rule matches for malware signatures (YARA-style)",
           items: {
             type: "object",
             properties: {

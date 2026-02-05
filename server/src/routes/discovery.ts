@@ -27,7 +27,7 @@ Pre-install security auditing for AI agent skills powered by x402.
 
 | Endpoint | Price | Description |
 |----------|-------|-------------|
-| \`/api/audit/quick\` | $0.01 USDC | YARA malware scan |
+| \`/api/audit/quick\` | $0.01 USDC | Pattern malware scan (YARA-style rules) |
 | \`/api/audit/standard\` | $0.05 USDC | + Permission & network analysis |
 | \`/api/audit/deep\` | $0.10 USDC | + Behavioral sandbox & attestation |
 

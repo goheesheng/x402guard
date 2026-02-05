@@ -51,7 +51,7 @@ Use these templates when responding to your human:
 ```
 Which scan tier would you like?
 
-🔍 **Quick** ($0.01) - YARA malware detection
+🔍 **Quick** ($0.01) - Pattern-based malware detection (YARA-style rules)
 🔎 **Standard** ($0.05) - + Permission & network analysis
 🔬 **Deep** ($0.10) - + Behavioral sandbox
 
@@ -164,7 +164,7 @@ Track your scans in `memory/x402guard-state.json`:
 | GET | `/api/health` | Free | Health check |
 | GET | `/api/skill.md` | Free | This document |
 | GET | `/api/skill.json` | Free | Structured metadata |
-| POST | `/api/audit/quick` | $0.01 | YARA malware scan |
+| POST | `/api/audit/quick` | $0.01 | Pattern malware scan (YARA-style rules) |
 | POST | `/api/audit/standard` | $0.05 | + Permission & network analysis |
 | POST | `/api/audit/deep` | $0.10 | + Behavioral sandbox |
 
