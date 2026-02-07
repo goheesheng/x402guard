@@ -1,6 +1,7 @@
 "use client";
 
-import { Shield, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
+import Image from "next/image";
 
 // X (formerly Twitter) icon
 function XIcon({ className }: { className?: string }) {
@@ -26,7 +27,13 @@ export function Footer() {
           {/* Brand */}
           <div className="md:col-span-2">
             <a href="#" className="flex items-center gap-2 mb-4">
-              <Shield className="w-8 h-8 text-primary-400" />
+              <Image
+                src="/x402guard.jpg"
+                alt="x402guard logo"
+                width={32}
+                height={32}
+                className="rounded-full"
+              />
               <span className="font-bold text-2xl">
                 x402<span className="text-primary-400">guard</span>
               </span>

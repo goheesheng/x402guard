@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui";
 import { WalletConnect } from "@/components/ui/WalletConnect";
 import { NAV_LINKS } from "@/lib/constants";
@@ -51,7 +52,13 @@ export function Navigation() {
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
             >
-              <Shield className="w-8 h-8 text-primary-400 group-hover:scale-110 transition-transform" />
+              <Image
+                src="/x402guard.jpg"
+                alt="x402guard logo"
+                width={32}
+                height={32}
+                className="rounded-full group-hover:scale-110 transition-transform"
+              />
               <span className="font-bold text-xl">
                 x402<span className="text-primary-400">guard</span>
               </span>
