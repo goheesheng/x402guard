@@ -21,6 +21,10 @@ export const metadata: Metadata = {
     "pre-install security",
   ],
   authors: [{ name: "x402guard" }],
+  icons: {
+    icon: "/x402guard.jpg",
+    apple: "/x402guard.jpg",
+  },
   openGraph: {
     title: "x402guard | Secure Agent Skills",
     description:
