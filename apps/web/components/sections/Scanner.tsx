@@ -132,22 +132,22 @@ export function Scanner() {
       case "awaiting_signature":
         return (
           <>
-            <PenLine className="w-5 h-5 animate-pulse" />
             Sign Payment in Wallet...
+            <PenLine className="w-5 h-5 animate-pulse" />
           </>
         );
       case "processing":
         return (
           <>
-            <Loader2 className="w-5 h-5 animate-spin" />
             Processing Payment & Scanning...
+            <Loader2 className="w-5 h-5 animate-spin" />
           </>
         );
       default:
         return (
           <>
-            <CreditCard className="w-5 h-5" />
             Pay {selectedTierData.price} USDC & Scan
+            <CreditCard className="w-5 h-5" />
           </>
         );
     }
@@ -309,7 +309,6 @@ export function Scanner() {
               size="lg"
               onClick={handleScan}
               disabled={(!skillUrl && !skillContent) || isLoading}
-              isLoading={isLoading}
             >
               {getButtonContent()}
             </Button>
