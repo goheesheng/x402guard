@@ -60,13 +60,25 @@ export function Navigation() {
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-1">
               {NAV_LINKS.map((link) => (
-                <button
-                  key={link.href}
-                  onClick={() => scrollToSection(link.href)}
-                  className="px-4 py-2 text-dark-300 hover:text-white transition-colors rounded-lg hover:bg-white/5"
-                >
-                  {link.label}
-                </button>
+                link.external ? (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 text-dark-300 hover:text-white transition-colors rounded-lg hover:bg-white/5"
+                  >
+                    {link.label}
+                  </a>
+                ) : (
+                  <button
+                    key={link.href}
+                    onClick={() => scrollToSection(link.href)}
+                    className="px-4 py-2 text-dark-300 hover:text-white transition-colors rounded-lg hover:bg-white/5"
+                  >
+                    {link.label}
+                  </button>
+                )
               ))}
             </div>
 
@@ -110,16 +122,31 @@ export function Navigation() {
             >
               <div className="flex flex-col gap-2">
                 {NAV_LINKS.map((link, i) => (
-                  <motion.button
-                    key={link.href}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                    onClick={() => scrollToSection(link.href)}
-                    className="px-4 py-3 text-lg text-dark-200 hover:text-white text-left rounded-xl hover:bg-white/5 transition-colors"
-                  >
-                    {link.label}
-                  </motion.button>
+                  link.external ? (
+                    <motion.a
+                      key={link.href}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                      className="px-4 py-3 text-lg text-dark-200 hover:text-white text-left rounded-xl hover:bg-white/5 transition-colors"
+                    >
+                      {link.label}
+                    </motion.a>
+                  ) : (
+                    <motion.button
+                      key={link.href}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                      onClick={() => scrollToSection(link.href)}
+                      className="px-4 py-3 text-lg text-dark-200 hover:text-white text-left rounded-xl hover:bg-white/5 transition-colors"
+                    >
+                      {link.label}
+                    </motion.button>
+                  )
                 ))}
                 <div className="border-t border-dark-800 my-4" />
                 <div className="mt-4">

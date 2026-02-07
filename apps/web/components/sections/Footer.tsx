@@ -37,7 +37,7 @@ export function Footer() {
             </p>
             <div className="flex items-center gap-4">
               <a
-                href="https://x.com/goheesheng"
+                href="https://x.com/x402guard"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-dark-400 hover:text-white transition-colors"
@@ -99,6 +99,17 @@ export function Footer() {
                   className="text-dark-400 hover:text-white transition-colors inline-flex items-center gap-1"
                 >
                   x402 Protocol
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://x402guard.gitbook.io/x402guard-whitepaper"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-dark-400 hover:text-white transition-colors inline-flex items-center gap-1"
+                >
+                  Whitepaper
                   <ExternalLink className="w-3 h-3" />
                 </a>
               </li>

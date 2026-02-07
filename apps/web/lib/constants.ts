@@ -87,10 +87,10 @@ export const FAQ_ITEMS: FAQItem[] = [
 ];
 
 export const NAV_LINKS = [
-  { href: "#overview", label: "Overview" },
   { href: "#how-it-works", label: "How It Works" },
   { href: "#ai-agents", label: "AI Agents" },
   { href: "#scanner", label: "Scanner" },
   { href: "#integration", label: "API Docs" },
   { href: "#faq", label: "FAQ" },
+  { href: "https://x402guard.gitbook.io/x402guard-whitepaper", label: "Whitepaper", external: true },
 ];
