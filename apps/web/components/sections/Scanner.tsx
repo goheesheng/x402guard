@@ -193,7 +193,7 @@ export function Scanner() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
+            className="mb-8 relative z-10"
           >
             <Card className="p-6 border-primary-500/30 bg-primary-500/5">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
