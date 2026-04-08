@@ -7,9 +7,25 @@ import auditRouter from "./routes/audit.js";
 import skillRouter from "./routes/skill.js";
 import discoveryRouter from "./routes/discovery.js";
 import verifyRouter from "./routes/verify.js";
+import { config } from "./config/index.js";
+import { createCorsMiddleware } from "./middleware/cors.js";
+import { createRateLimitMiddleware } from "./middleware/rateLimit.js";
+import { createRateLimitStore } from "./middleware/rateLimitStore.js";
+
+function parseTrustProxy(value: string): boolean | number | string {
+  const normalized = value.trim().toLowerCase();
+  if (normalized === "true") return true;
+  if (normalized === "false") return false;
+  const numeric = Number(normalized);
+  if (!Number.isNaN(numeric)) return numeric;
+  return value;
+}
 
 export function createServer(): Express {
   const app: Express = express();
+
+  // Honor proxy headers when configured (required for correct client IPs behind proxies).
+  app.set("trust proxy", parseTrustProxy(config.TRUST_PROXY || "0"));
   
   // Middleware
   app.use(express.json({ limit: "2mb" }));
@@ -20,46 +36,24 @@ export function createServer(): Express {
     next();
   });
   
-  /**
-   * CORS Configuration for x402 Payment Protocol
-   *
-   * IMPORTANT: The x402 payment flow requires specific CORS headers:
-   *
-   * 1. Access-Control-Allow-Headers MUST include:
-   *    - PAYMENT-SIGNATURE: The signed payment proof sent by the client
-   *    - X-PAYMENT: Alternative payment header (v1 compatibility)
-   *    - Access-Control-Expose-Headers: The x402 client sets this on retry requests
-   *
-   * 2. Access-Control-Expose-Headers MUST include:
-   *    - PAYMENT-REQUIRED: Server sends this with 402 response (base64 encoded payment requirements)
-   *    - PAYMENT-RESPONSE: Server sends this after successful payment verification
-   *
-   * Common issues fixed:
-   * - "Failed to parse payment requirements: Invalid payment required response"
-   *   → PAYMENT-REQUIRED header not exposed to browser (missing from Expose-Headers)
-   *
-   * - "Request header field access-control-expose-headers is not allowed"
-   *   → x402 client sends Access-Control-Expose-Headers on retry, must be in Allow-Headers
-   *
-   * - "Failed to fetch" with 402 status
-   *   → CORS blocking the response headers, check both Allow-Headers and Expose-Headers
-   */
-  app.use((req: any, res: any, next: any) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    // Allow all x402 payment headers (the client sends Access-Control-Expose-Headers on retry)
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Payment, PAYMENT-SIGNATURE, X-PAYMENT, Access-Control-Expose-Headers");
-    res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    // Expose all x402 payment headers (both v1 and v2 formats)
-    res.header("Access-Control-Expose-Headers", "PAYMENT-REQUIRED, PAYMENT-RESPONSE, X-Payment-Response, X-Payment-Required");
-    if (req.method === "OPTIONS") {
-      res.sendStatus(200);
-      return;
-    }
-    next();
-  });
+  app.use(createCorsMiddleware({ allowedOrigins: config.CORS_ALLOWED_ORIGINS }));
   
   // x402 Discovery endpoint (must be at root, not /api)
   app.use(discoveryRouter);
+
+  // Basic global API request throttling
+  app.use(
+    "/api",
+    createRateLimitMiddleware({
+      windowMs: config.RATE_LIMIT_WINDOW,
+      max: config.RATE_LIMIT_MAX,
+      store: createRateLimitStore({
+        provider: config.RATE_LIMIT_STORE,
+        upstashUrl: config.UPSTASH_REDIS_REST_URL,
+        upstashToken: config.UPSTASH_REDIS_REST_TOKEN,
+      }),
+    })
+  );
 
   // Routes (all under /api prefix)
   app.use("/api", healthRouter);

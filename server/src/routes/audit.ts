@@ -7,6 +7,11 @@ import { auditSkill } from "../services/auditEngine/index.js";
 import { config } from "../config/index.js";
 import { createX402Middleware, getPricingInfo } from "../middleware/x402.js";
 import { signAttestation } from "../utils/attestation.js";
+import {
+  assertSafeOutboundUrl,
+  fetchWithTimeout,
+  readResponseTextWithLimit,
+} from "../utils/urlSecurity.js";
 import type { AuditResponse, AuditTier } from "../types/api.js";
 
 const router: RouterType = Router();
@@ -23,22 +28,44 @@ const auditRequestSchema = z.object({
 
 // Fetch skill from URL
 async function fetchSkillContent(url: string): Promise<string> {
-  if (!url.startsWith("https://")) {
-    throw new AppError("Only HTTPS URLs are allowed", "INVALID_URL", 400);
+  let safeUrl: URL;
+  try {
+    safeUrl = await assertSafeOutboundUrl(url);
+  } catch (error) {
+    throw new AppError(
+      (error as Error).message || "Invalid URL",
+      "INVALID_URL",
+      400
+    );
   }
 
-  const fetchResult: any = await fetch(url, {
-    headers: { "User-Agent": "x402guard/0.1" },
-  });
+  let fetchResult: any;
+  try {
+    fetchResult = await fetchWithTimeout(
+      safeUrl.toString(),
+      { userAgent: "x402guard/0.1", timeoutMs: config.FETCH_TIMEOUT_MS }
+    );
+  } catch (error) {
+    throw new AppError(
+      `Failed to fetch skill: ${(error as Error).message}`,
+      "FETCH_ERROR",
+      400
+    );
+  }
 
   if (!fetchResult.ok) {
     throw new AppError(`Failed to fetch skill: ${fetchResult.status}`, "FETCH_ERROR", 400);
   }
 
-  const content = await fetchResult.text();
-
-  if (content.length > config.MAX_SKILL_SIZE) {
-    throw new AppError("Skill content exceeds maximum size", "SKILL_TOO_LARGE", 413);
+  let content: string;
+  try {
+    content = await readResponseTextWithLimit(fetchResult, config.MAX_SKILL_SIZE);
+  } catch (error) {
+    throw new AppError(
+      (error as Error).message,
+      "SKILL_TOO_LARGE",
+      413
+    );
   }
 
   return content;
@@ -58,6 +85,14 @@ async function runAuditHandler(req: any, res: any, next: any, tier: AuditTier) {
     }
 
     const { skill_url, skill_content } = parseResult.data;
+
+    if (tier === "deep" && !config.ATTESTATION_PRIVATE_KEY) {
+      throw new AppError(
+        "Deep audit requires ATTESTATION_PRIVATE_KEY for signed attestations",
+        "ATTESTATION_NOT_CONFIGURED",
+        503
+      );
+    }
 
     // Get skill content
     let content: string;
@@ -86,8 +121,17 @@ async function runAuditHandler(req: any, res: any, next: any, tier: AuditTier) {
       response.attestation = await signAttestation(
         response,
         skillUrl,
-        config.ATTESTATION_PRIVATE_KEY
+        config.ATTESTATION_PRIVATE_KEY as string
       );
+
+      if (!response.attestation.signature || !response.attestation.signer) {
+        throw new AppError(
+          "Failed to generate signed attestation",
+          "ATTESTATION_SIGNING_FAILED",
+          503,
+          response.attestation.warning
+        );
+      }
     }
 
     // Send response
@@ -102,15 +146,19 @@ router.use(createX402Middleware());
 
 // GET /audit - Return pricing info (free)
 router.get("/audit", (_req: any, res: any) => {
+  const deepTierDescription = config.ATTESTATION_PRIVATE_KEY
+    ? "$0.10 - Complete audit + behavioral sandbox"
+    : "Unavailable - ATTESTATION_PRIVATE_KEY is not configured";
+
   res.json({
     message: "x402guard Audit API",
     method: "POST",
     pricing: getPricingInfo(),
     payment: "x402 - Include X-Payment header with payment proof",
     endpoints: {
-      "/audit/quick": "$0.01 - YARA malware scan",
+      "/audit/quick": "$0.01 - Pattern malware scan (YARA-style rules)",
       "/audit/standard": "$0.05 - Full analysis + permissions + network",
-      "/audit/deep": "$0.10 - Complete audit + behavioral sandbox",
+      "/audit/deep": deepTierDescription,
     },
   });
 });

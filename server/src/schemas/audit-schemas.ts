@@ -70,7 +70,7 @@ export const auditOutputSchema = {
       properties: {
         malware: {
           type: "array",
-          description: "YARA rule matches for malware signatures",
+          description: "Pattern-rule matches for malware signatures (YARA-style)",
           items: {
             type: "object",
             properties: {
@@ -137,11 +137,31 @@ export const auditOutputSchema = {
     },
     attestation: {
       type: "object",
-      description: "On-chain attestation (deep tier only)",
+      description: "EIP-712 signed attestation (deep tier only)",
       properties: {
-        signature: { type: "string", description: "Attestation signature" },
+        message: {
+          type: "object",
+          description: "Attested audit summary",
+          properties: {
+            audit_id: { type: "string" },
+            skill_url: { type: "string" },
+            risk_score: { type: "number" },
+            risk_level: { type: "string" },
+            timestamp: { type: "number" },
+          },
+        },
+        signature: { type: "string", description: "EIP-712 signature" },
         signer: { type: "string", description: "Signer address" },
-        chain: { type: "string", description: "Chain identifier" },
+        domain: {
+          type: "object",
+          description: "EIP-712 domain",
+          properties: {
+            name: { type: "string" },
+            version: { type: "string" },
+            chainId: { type: "number" },
+          },
+        },
+        warning: { type: "string", description: "Optional warning message" },
       },
     },
   },
