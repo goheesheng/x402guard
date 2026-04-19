@@ -3,6 +3,16 @@
 export type AuditTier = "quick" | "standard" | "deep";
 export type RiskLevel = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 export type Recommendation = "SAFE" | "CAUTION" | "DANGEROUS" | "BLOCKED";
+export type GateDecision = "allow" | "warn" | "deny";
+
+export function recommendationToGateDecision(rec: Recommendation): GateDecision {
+  switch (rec) {
+    case "SAFE": return "allow";
+    case "CAUTION": return "warn";
+    case "DANGEROUS": return "deny";
+    case "BLOCKED": return "deny";
+  }
+}
 
 export interface AuditRequest {
   skill_url?: string;
@@ -85,6 +95,7 @@ export interface AuditResponse {
   risk_score: number;
   risk_level: RiskLevel;
   recommendation: Recommendation;
+  gate_decision: GateDecision;
   findings: AuditFindings;
   audit_id: string;
   timestamp: string;

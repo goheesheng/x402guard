@@ -43,7 +43,7 @@ export interface AuditRequest {
   skillUrl?: string;
   /** Raw skill content (alternative to skillUrl) */
   skillContent?: string;
-  /** Audit tier: quick ($0.01), standard ($0.05), deep ($0.10) */
+  /** Audit tier: quick ($0.10), standard ($0.50), deep ($1.00) */
   tier?: AuditTier;
 }
 
@@ -100,12 +100,12 @@ export interface HealthResponse {
 // =============================================================================
 
 export const PRICING = {
-  quick: { price: 10000, usd: 0.01 },
-  standard: { price: 50000, usd: 0.05 },
-  deep: { price: 100000, usd: 0.10 },
+  quick: { price: 100000, usd: 0.10 },
+  standard: { price: 500000, usd: 0.50 },
+  deep: { price: 1000000, usd: 1.00 },
 } as const;
 
-export const DEFAULT_API_URL = 'https://x402guard.vercel.app';
+export const DEFAULT_API_URL = 'https://x402guard.xyz';
 
 // =============================================================================
 // Client
@@ -196,21 +196,21 @@ export class X402GuardClient {
   }
 
   /**
-   * Quick audit - YARA malware scan only ($0.01)
+   * Quick audit - YARA malware scan only ($0.10)
    */
   async quickAudit(skillUrl: string): Promise<AuditResult> {
     return this.auditSkill({ skillUrl, tier: 'quick' });
   }
 
   /**
-   * Standard audit - Full analysis + permissions + network ($0.05)
+   * Standard audit - Full analysis + permissions + network ($0.50)
    */
   async standardAudit(skillUrl: string): Promise<AuditResult> {
     return this.auditSkill({ skillUrl, tier: 'standard' });
   }
 
   /**
-   * Deep audit - Complete audit + behavioral sandbox ($0.10)
+   * Deep audit - Complete audit + behavioral sandbox ($1.00)
    */
   async deepAudit(skillUrl: string): Promise<AuditResult> {
     return this.auditSkill({ skillUrl, tier: 'deep' });

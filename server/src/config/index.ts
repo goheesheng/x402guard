@@ -31,15 +31,21 @@ const envSchema = z.object({
   ATTESTATION_PRIVATE_KEY: z.string().optional(),
 
   // Pricing (USDC atomic units, 6 decimals)
-  // $0.01 = 10000, $0.05 = 50000, $0.10 = 100000
-  PRICE_QUICK: z.string().default("10000").transform(Number),
-  PRICE_STANDARD: z.string().default("50000").transform(Number),
-  PRICE_DEEP: z.string().default("100000").transform(Number),
+  // $0.10 = 100000, $0.50 = 500000, $1.00 = 1000000
+  PRICE_QUICK: z.string().default("100000").transform(Number),
+  PRICE_STANDARD: z.string().default("500000").transform(Number),
+  PRICE_DEEP: z.string().default("1000000").transform(Number),
 
   // Limits
   MAX_SKILL_SIZE: z.string().default("1048576").transform(Number),
   RATE_LIMIT_WINDOW: z.string().default("60000").transform(Number),
   RATE_LIMIT_MAX: z.string().default("100").transform(Number),
+
+  // Admin API Key (for whitelist management)
+  ADMIN_API_KEY: z.string().optional(),
+
+  // Internal ACP shared secret (for ACP seller → server communication)
+  ACP_INTERNAL_SECRET: z.string().optional(),
 });
 
 function loadConfig() {

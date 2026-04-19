@@ -69,22 +69,22 @@ export const SKILL_METADATA: SkillMetadata = {
     audit_quick: {
       method: "POST",
       path: "/api/audit/quick",
-      description: "Quick YARA malware scan ($0.01 USDC)",
-      price_usdc: "0.01",
+      description: "Quick YARA malware scan ($0.10 USDC)",
+      price_usdc: "0.10",
       requires_payment: true,
     },
     audit_standard: {
       method: "POST",
       path: "/api/audit/standard",
-      description: "Standard scan with permissions + network analysis ($0.05 USDC)",
-      price_usdc: "0.05",
+      description: "Standard scan with permissions + network analysis ($0.50 USDC)",
+      price_usdc: "0.50",
       requires_payment: true,
     },
     audit_deep: {
       method: "POST",
       path: "/api/audit/deep",
-      description: "Deep scan with behavioral sandbox + attestation ($0.10 USDC)",
-      price_usdc: "0.10",
+      description: "Deep scan with behavioral sandbox + attestation ($1.00 USDC)",
+      price_usdc: "1.00",
       requires_payment: true,
     },
     health: {
@@ -112,9 +112,9 @@ export const SKILL_METADATA: SkillMetadata = {
     asset_name: "USDC",
     decimals: 6,
     tiers: {
-      quick: "0.05",
-      standard: "0.15",
-      deep: "0.50",
+      quick: "0.10",
+      standard: "0.50",
+      deep: "1.00",
     },
   },
   documentation: {
