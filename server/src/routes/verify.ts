@@ -66,7 +66,7 @@ router.get("/verify", (_req: any, res: any) => {
   res.json({
     message: "x402guard Attestation Verification API",
     method: "POST",
-    description: "Verify EIP-712 signed attestations from deep scans",
+    description: "Verify EIP-712 signed attestations from all scan tiers",
     request: {
       body: "Attestation object from deep scan response",
       query: {

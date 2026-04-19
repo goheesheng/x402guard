@@ -1,0 +1,42 @@
+{
+  "name": "@x402guard/langchain",
+  "version": "0.1.0",
+  "description": "x402guard security scanner for LangChain tool registration",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "x402guard-client": "workspace:*"
+  },
+  "peerDependencies": {
+    "@langchain/core": ">=0.2.0"
+  },
+  "peerDependenciesMeta": {
+    "@langchain/core": {
+      "optional": true
+    }
+  },
+  "keywords": [
+    "x402guard",
+    "security",
+    "ai-agent",
+    "langchain",
+    "tool-scanning",
+    "x402"
+  ],
+  "license": "MIT"
+}

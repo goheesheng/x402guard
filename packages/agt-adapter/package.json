@@ -1,0 +1,42 @@
+{
+  "name": "@x402guard/agt-adapter",
+  "version": "0.1.0",
+  "description": "x402guard security scanner adapter for Microsoft Agent Governance Toolkit",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "x402guard-client": "workspace:*"
+  },
+  "peerDependencies": {
+    "@microsoft/agentmesh-sdk": ">=0.1.0"
+  },
+  "peerDependenciesMeta": {
+    "@microsoft/agentmesh-sdk": {
+      "optional": true
+    }
+  },
+  "keywords": [
+    "x402guard",
+    "security",
+    "ai-agent",
+    "microsoft-agt",
+    "policy-provider",
+    "x402"
+  ],
+  "license": "MIT"
+}

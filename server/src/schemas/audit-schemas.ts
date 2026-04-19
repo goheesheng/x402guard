@@ -163,6 +163,7 @@ export const auditOutputExample: AuditResponse = {
   risk_score: 15,
   risk_level: "LOW",
   recommendation: "SAFE",
+  gate_decision: "allow",
   findings: {
     malware: [],
     credentials: [],

@@ -7,6 +7,12 @@ import auditRouter from "./routes/audit.js";
 import skillRouter from "./routes/skill.js";
 import discoveryRouter from "./routes/discovery.js";
 import verifyRouter from "./routes/verify.js";
+import intelRouter from "./routes/intel.js";
+import adminRouter from "./routes/admin.js";
+import whitelistRouter from "./routes/whitelist.js";
+import policyRouter from "./routes/policy.js";
+import deploymentsRouter from "./routes/deployments.js";
+import reputationRouter from "./routes/reputation.js";
 
 export function createServer(): Express {
   const app: Express = express();
@@ -46,8 +52,8 @@ export function createServer(): Express {
    */
   app.use((req: any, res: any, next: any) => {
     res.header("Access-Control-Allow-Origin", "*");
-    // Allow all x402 payment headers (the client sends Access-Control-Expose-Headers on retry)
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Payment, PAYMENT-SIGNATURE, X-PAYMENT, Access-Control-Expose-Headers");
+    // Allow all x402 payment headers and whitelist auth headers
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Payment, PAYMENT-SIGNATURE, X-PAYMENT, Access-Control-Expose-Headers, x-wallet-address, x-wallet-signature, x-admin-api-key, x-expires-at");
     res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     // Expose all x402 payment headers (both v1 and v2 formats)
     res.header("Access-Control-Expose-Headers", "PAYMENT-REQUIRED, PAYMENT-RESPONSE, X-Payment-Response, X-Payment-Required");
@@ -67,6 +73,12 @@ export function createServer(): Express {
   app.use("/api", skillRouter);
   app.use("/api", auditRouter);
   app.use("/api", verifyRouter);
+  app.use("/api", intelRouter);
+  app.use("/api/admin", adminRouter);
+  app.use("/api/whitelist", whitelistRouter);
+  app.use("/api/policy", policyRouter);
+  app.use("/api/deployments", deploymentsRouter);
+  app.use("/api/reputation", reputationRouter);
 
   // Error handler
   app.use(errorHandler);
